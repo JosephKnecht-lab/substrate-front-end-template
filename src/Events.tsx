@@ -1,37 +1,42 @@
-import React, { useEffect, useState } from 'react'
-import { Feed, Grid, Button } from 'semantic-ui-react'
+import React, { useEffect, useState } from 'react';
+import { Feed, Grid, Button } from 'semantic-ui-react';
 
-import { useSubstrateState } from './substrate-lib'
+import { useSubstrateState } from './substrate-lib';
 
 // Events to be filtered from feed
-const FILTERED_EVENTS = [
-  'system:ExtrinsicSuccess::(phase={"applyExtrinsic":0})',
-]
+const FILTERED_EVENTS = ['system:ExtrinsicSuccess::(phase={"applyExtrinsic":0})'];
 
-const eventName = ev => `${ev.section}:${ev.method}`
-const eventParams = ev => JSON.stringify(ev.data)
+interface EventFeedItem {
+  key: number;
+  icon: string;
+  summary: string;
+  content: string;
+}
 
-function Main(props) {
-  const { api } = useSubstrateState()
-  const [eventFeed, setEventFeed] = useState([])
+const eventName = (ev: any) => `${ev.section}:${ev.method}`;
+const eventParams = (ev: any) => JSON.stringify(ev.data);
+
+function Main(props: any) {
+  const { api } = useSubstrateState();
+  const [eventFeed, setEventFeed] = useState<EventFeedItem[]>([]);
 
   useEffect(() => {
-    let unsub = null
-    let keyNum = 0
+    let unsub: (() => void) | null = null;
+    let keyNum = 0;
     const allEvents = async () => {
-      unsub = await api.query.system.events(events => {
+      unsub = await api.query.system.events((events: any) => {
         // loop through the Vec<EventRecord>
-        events.forEach(record => {
-          // extract the phase, event and the event types
-          const { event, phase } = record
+        events.forEach((record: any) => {
+          // extract the phase, event, and the event types
+          const { event, phase } = record;
 
           // show what we are busy with
-          const evHuman = event.toHuman()
-          const evName = eventName(evHuman)
-          const evParams = eventParams(evHuman)
-          const evNamePhase = `${evName}::(phase=${phase.toString()})`
+          const evHuman = event.toHuman();
+          const evName = eventName(evHuman);
+          const evParams = eventParams(evHuman);
+          const evNamePhase = `${evName}::(phase=${phase.toString()})`;
 
-          if (FILTERED_EVENTS.includes(evNamePhase)) return
+          if (FILTERED_EVENTS.includes(evNamePhase)) return;
 
           setEventFeed(e => [
             {
@@ -41,18 +46,18 @@ function Main(props) {
               content: evParams,
             },
             ...e,
-          ])
+          ]);
 
-          keyNum += 1
-        })
-      })
-    }
+          keyNum += 1;
+        });
+      });
+    };
 
-    allEvents()
-    return () => unsub && unsub()
-  }, [api.query.system])
+    allEvents();
+    return () => unsub && unsub();
+  }, [api.query.system]);
 
-  const { feedMaxHeight = 250 } = props
+  const { feedMaxHeight = 250 } = props;
 
   return (
     <Grid.Column width={8}>
@@ -71,12 +76,10 @@ function Main(props) {
         events={eventFeed}
       />
     </Grid.Column>
-  )
+  );
 }
 
-export default function Events(props) {
-  const { api } = useSubstrateState()
-  return api.query && api.query.system && api.query.system.events ? (
-    <Main {...props} />
-  ) : null
+export default function Events(props: any) {
+  const { api } = useSubstrateState();
+  return api.query && api.query.system && api.query.system.events ? <Main {...props} /> : null;
 }

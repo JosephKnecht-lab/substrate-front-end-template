@@ -1,39 +1,41 @@
-import React, { useEffect, useState } from 'react'
-import { Form, Input, Grid, Card, Statistic } from 'semantic-ui-react'
+import React, { useEffect, useState } from 'react';
+import { Form, Input, Grid, Card, Statistic } from 'semantic-ui-react';
 
-import { useSubstrateState } from './substrate-lib'
-import { TxButton } from './substrate-lib/components'
+import { useSubstrateState } from './substrate-lib';
+import { TxButton } from './substrate-lib/components';
 
-function Main(props) {
-  const { api } = useSubstrateState()
+interface MainProps {}
+
+function Main(props: MainProps) {
+  const { api } = useSubstrateState();
 
   // The transaction submission status
-  const [status, setStatus] = useState('')
+  const [status, setStatus] = useState<string>('');
 
   // The currently stored value
-  const [currentValue, setCurrentValue] = useState(0)
-  const [formValue, setFormValue] = useState(0)
+  const [currentValue, setCurrentValue] = useState<string | number>(0);
+  const [formValue, setFormValue] = useState<number>(0);
 
   useEffect(() => {
-    let unsubscribe
+    let unsubscribe: () => any;
     api.query.templateModule
-      .something(newValue => {
+      .something((newValue) => {
         // The storage value is an Option<u32>
         // So we have to check whether it is None first
         // There is also unwrapOr
         if (newValue.isNone) {
-          setCurrentValue('<None>')
+          setCurrentValue('<None>');
         } else {
-          setCurrentValue(newValue.unwrap().toNumber())
+          setCurrentValue(newValue.unwrap().toNumber());
         }
       })
-      .then(unsub => {
-        unsubscribe = unsub
+      .then((unsub) => {
+        unsubscribe = unsub;
       })
-      .catch(console.error)
+      .catch(console.error);
 
-    return () => unsubscribe && unsubscribe()
-  }, [api.query.templateModule])
+    return () => unsubscribe && unsubscribe();
+  }, [api.query.templateModule]);
 
   return (
     <Grid.Column width={8}>
@@ -49,7 +51,7 @@ function Main(props) {
             label="New Value"
             state="newValue"
             type="number"
-            onChange={(_, { value }) => setFormValue(value)}
+            onChange={(_, { value }) => setFormValue(Number(value))}
           />
         </Form.Field>
         <Form.Field style={{ textAlign: 'center' }}>
@@ -68,12 +70,12 @@ function Main(props) {
         <div style={{ overflowWrap: 'break-word' }}>{status}</div>
       </Form>
     </Grid.Column>
-  )
+  );
 }
 
-export default function TemplateModule(props) {
-  const { api } = useSubstrateState()
+export default function TemplateModule(props: any) {
+  const { api } = useSubstrateState();
   return api.query.templateModule && api.query.templateModule.something ? (
     <Main {...props} />
-  ) : null
+  ) : null;
 }

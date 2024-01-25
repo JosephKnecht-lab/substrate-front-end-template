@@ -1,28 +1,32 @@
-import React, { useState } from 'react'
-import { Form, Input, Grid, Label, Icon, Dropdown } from 'semantic-ui-react'
-import { TxButton } from './substrate-lib/components'
-import { useSubstrateState } from './substrate-lib'
+import React, { useState, ChangeEvent } from 'react';
+import { Form, Input, Grid, Label, Icon, Dropdown, DropdownItemProps } from 'semantic-ui-react';
+import { TxButton } from './substrate-lib/components';
+import { useSubstrateState } from './substrate-lib';
 
-export default function Main(props) {
-  const [status, setStatus] = useState(null)
-  const [formState, setFormState] = useState({ addressTo: '', amount: 0 })
+interface MainProps {}
 
-  const onChange = (_, data) =>
-    setFormState(prev => ({ ...prev, [data.state]: data.value }))
+interface FormState {
+  addressTo: string;
+  amount: number;
+}
 
-  const { addressTo, amount } = formState
+export default function Main(props: MainProps) {
+  const [status, setStatus] = useState<string | null>(null);
+  const [formState, setFormState] = useState<FormState>({ addressTo: '', amount: 0 });
 
-  const { keyring } = useSubstrateState()
-  const accounts = keyring.getPairs()
+  const onChange = (_: React.SyntheticEvent<HTMLElement>, data: DropdownItemProps) => {
+    setFormState(prev => ({ ...prev, [data.state]: data.value }));
+  };
 
-  const availableAccounts = []
-  accounts.map(account => {
-    return availableAccounts.push({
-      key: account.meta.name,
-      text: account.meta.name,
-      value: account.address,
-    })
-  })
+  const { addressTo, amount } = formState;
+  const { keyring } = useSubstrateState();
+  const accounts = keyring.getPairs();
+
+  const availableAccounts: DropdownItemProps[] = accounts.map(account => ({
+    key: account.meta.name,
+    text: account.meta.name,
+    value: account.address,
+  }));
 
   return (
     <Grid.Column width={8}>
@@ -32,13 +36,9 @@ export default function Main(props) {
           <Label basic color="teal">
             <Icon name="hand point right" />1 Unit = 1000000000000&nbsp;
           </Label>
-          <Label
-            basic
-            color="teal"
-            style={{ marginLeft: 0, marginTop: '.5em' }}
-          >
+          <Label basic color="teal" style={{ marginLeft: 0, marginTop: '.5em' }}>
             <Icon name="hand point right" />
-            Transfer more than the existential amount for account with 0 balance
+            Transfer more than the existential amount for an account with 0 balance
           </Label>
         </Form.Field>
 
@@ -62,18 +62,20 @@ export default function Main(props) {
             placeholder="address"
             value={addressTo}
             state="addressTo"
-            onChange={onChange}
+            onChange={(_, { value }) => setFormState(prev => ({ ...prev, addressTo: value as string }))}
           />
         </Form.Field>
+
         <Form.Field>
           <Input
             fluid
             label="Amount"
             type="number"
             state="amount"
-            onChange={onChange}
+            onChange={(_, { value }) => setFormState(prev => ({ ...prev, amount: Number(value) }))}
           />
         </Form.Field>
+
         <Form.Field style={{ textAlign: 'center' }}>
           <TxButton
             label="Submit"
@@ -87,8 +89,9 @@ export default function Main(props) {
             }}
           />
         </Form.Field>
+
         <div style={{ overflowWrap: 'break-word' }}>{status}</div>
       </Form>
     </Grid.Column>
-  )
+  );
 }

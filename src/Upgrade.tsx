@@ -1,26 +1,30 @@
-import React, { useState } from 'react'
-import { Form, Input, Grid } from 'semantic-ui-react'
-import { TxButton } from './substrate-lib/components'
+import React, { useState, ChangeEvent } from 'react';
+import { Form, Input, Grid } from 'semantic-ui-react';
+import { TxButton } from './substrate-lib/components';
 
-export default function Main(props) {
-  const [status, setStatus] = useState('')
-  const [proposal, setProposal] = useState({})
+interface MainProps {}
 
-  const bufferToHex = buffer => {
+export default function Main(props: MainProps) {
+  const [status, setStatus] = useState<string>('');
+  const [proposal, setProposal] = useState<string>('');
+
+  const bufferToHex = (buffer: ArrayBuffer): string => {
     return Array.from(new Uint8Array(buffer))
       .map(b => b.toString(16).padStart(2, '0'))
-      .join('')
-  }
+      .join('');
+  };
 
-  const handleFileChosen = file => {
-    const fileReader = new FileReader()
-    fileReader.onloadend = e => {
-      const content = bufferToHex(fileReader.result)
-      setProposal(`0x${content}`)
-    }
+  const handleFileChosen = (file: File) => {
+    const fileReader = new FileReader();
+    fileReader.onloadend = (e: ProgressEvent<FileReader>) => {
+      if (e.target && e.target.result instanceof ArrayBuffer) {
+        const content = bufferToHex(e.target.result);
+        setProposal(`0x${content}`);
+      }
+    };
 
-    fileReader.readAsArrayBuffer(file)
-  }
+    fileReader.readAsArrayBuffer(file);
+  };
 
   return (
     <Grid.Column width={8}>
@@ -32,9 +36,10 @@ export default function Main(props) {
             id="file"
             label="Wasm File"
             accept=".wasm"
-            onChange={e => handleFileChosen(e.target.files[0])}
+            onChange={(e: ChangeEvent<HTMLInputElement>) => handleFileChosen(e.target.files[0])}
           />
         </Form.Field>
+
         <Form.Field style={{ textAlign: 'center' }}>
           <TxButton
             label="Upgrade"
@@ -48,8 +53,9 @@ export default function Main(props) {
             }}
           />
         </Form.Field>
+
         <div style={{ overflowWrap: 'break-word' }}>{status}</div>
       </Form>
     </Grid.Column>
-  )
+  );
 }

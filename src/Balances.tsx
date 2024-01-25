@@ -1,35 +1,42 @@
-import React, { useEffect, useState } from 'react'
-import { Table, Grid, Button, Label } from 'semantic-ui-react'
-import { CopyToClipboard } from 'react-copy-to-clipboard'
-import { useSubstrateState } from './substrate-lib'
+import React, { useEffect, useState } from 'react';
+import { Table, Grid, Button, Label } from 'semantic-ui-react';
+import { CopyToClipboard } from 'react-copy-to-clipboard';
+import { useSubstrateState } from './substrate-lib';
 
-export default function Main(props) {
-  const { api, keyring } = useSubstrateState()
-  const accounts = keyring.getPairs()
-  const [balances, setBalances] = useState({})
+interface Account {
+  address: string;
+  meta: {
+    name: string;
+  };
+}
+
+export default function Main(props: any) {
+  const { api, keyring } = useSubstrateState();
+  const accounts: Account[] = keyring.getPairs();
+  const [balances, setBalances] = useState<{ [address: string]: string }>({});
 
   useEffect(() => {
-    const addresses = keyring.getPairs().map(account => account.address)
-    let unsubscribeAll = null
+    const addresses: string[] = keyring.getPairs().map((account: { address: any; }) => account.address);
+    let unsubscribeAll: (() => void) | null = null;
 
     api.query.system.account
-      .multi(addresses, balances => {
-        const balancesMap = addresses.reduce(
+      .multi(addresses, (accountBalances: { data: { free: { toHuman: () => any; }; }; }[]) => {
+        const balancesMap: { [address: string]: string } = addresses.reduce(
           (acc, address, index) => ({
             ...acc,
-            [address]: balances[index].data.free.toHuman(),
+            [address]: accountBalances[index].data.free.toHuman(),
           }),
           {}
-        )
-        setBalances(balancesMap)
+        );
+        setBalances(balancesMap);
       })
-      .then(unsub => {
-        unsubscribeAll = unsub
+      .then((unsub: (() => void) | null) => {
+        unsubscribeAll = unsub;
       })
-      .catch(console.error)
+      .catch(console.error);
 
-    return () => unsubscribeAll && unsubscribeAll()
-  }, [api, keyring, setBalances])
+    return () => unsubscribeAll && unsubscribeAll();
+  }, [api, keyring, setBalances]);
 
   return (
     <Grid.Column>
@@ -83,5 +90,5 @@ export default function Main(props) {
         </Table>
       )}
     </Grid.Column>
-  )
+  );
 }
