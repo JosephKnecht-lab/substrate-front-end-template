@@ -2214,6 +2214,22 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@mui/icons-material@npm:^5.15.6":
+  version: 5.15.6
+  resolution: "@mui/icons-material@npm:5.15.6"
+  dependencies:
+    "@babel/runtime": ^7.23.8
+  peerDependencies:
+    "@mui/material": ^5.0.0
+    "@types/react": ^17.0.0 || ^18.0.0
+    react: ^17.0.0 || ^18.0.0
+  peerDependenciesMeta:
+    "@types/react":
+      optional: true
+  checksum: 9e48abacc7dbcf6461a1451aebd92c6f50826a464bc5f5f8251c6e0868025405d865068089878ecd96a941ddc5ca71789d3534705401fe0db72a1c9ab11df0c1
+  languageName: node
+  linkType: hard
+
 "@mui/material@npm:^5.15.6":
   version: 5.15.6
   resolution: "@mui/material@npm:5.15.6"
@@ -3748,7 +3764,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@typescript-eslint/parser@npm:^6.19.1":
+"@typescript-eslint/parser@npm:^6.5.1":
   version: 6.19.1
   resolution: "@typescript-eslint/parser@npm:6.19.1"
   dependencies:
@@ -13632,6 +13648,7 @@ __metadata:
   dependencies:
     "@emotion/react": ^11.11.3
     "@emotion/styled": ^11.11.0
+    "@mui/icons-material": ^5.15.6
     "@mui/material": ^5.15.6
     "@polkadot/api": ^10.6.1
     "@polkadot/extension-dapp": ^0.46.2
@@ -13647,7 +13664,7 @@ __metadata:
     "@types/react": ^18.2.48
     "@types/react-dom": ^18.2.18
     "@typescript-eslint/eslint-plugin": ^6.19.1
-    "@typescript-eslint/parser": ^6.19.1
+    "@typescript-eslint/parser": ^6.5.1
     eslint: ^8.10.0
     eslint-config-prettier: ^8.4.0
     eslint-config-react-app: ^7.0.0

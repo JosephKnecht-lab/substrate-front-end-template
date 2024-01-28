@@ -1,126 +1,144 @@
 import React, { useState, useEffect } from 'react';
 import { CopyToClipboard } from 'react-copy-to-clipboard';
-import { Menu, Button, Dropdown, Container, Icon, Image, Label } from 'semantic-ui-react';
+import {
+  AppBar,
+  Toolbar,
+  IconButton,
+  Typography,
+  Button,
+  Menu,
+  MenuItem,
+  Grid,
+  Container,
+  Avatar,
+  ListItemIcon,
+  ListItemText,
+  ListItem,
+  ListItemAvatar,
+  Divider,
+  Select,
+  FormControl,
+  InputLabel,
+} from '@mui/material';
 import { useSubstrate, useSubstrateState } from './substrate-lib';
+import AccountCircleIcon from '@mui/icons-material/AccountCircle';
+import MoneyIcon from '@mui/icons-material/Money';
 
 const CHROME_EXT_URL = 'https://chrome.google.com/webstore/detail/polkadot%7Bjs%7D-extension/mopnmbcafieddcagagdcbnhejhlodfdd';
 const FIREFOX_ADDON_URL = 'https://addons.mozilla.org/en-US/firefox/addon/polkadot-js-extension/';
 
-const acctAddr = (acct: { address: string } | null) => (acct ? acct.address : '');
+const acctAddr = (acct) => (acct ? acct.address : '');
 
-function Main(props: any) {
+function Main(props) {
   const {
     setCurrentAccount,
     state: { keyring, currentAccount },
   } = useSubstrate();
 
-  // Get the list of accounts we possess the private key for
-  const keyringOptions = keyring.getPairs().map((account: { address: any; meta: { name: string; }; }) => ({
+  const keyringOptions = keyring.getPairs().map((account) => ({
     key: account.address,
     value: account.address,
     text: account.meta.name.toUpperCase(),
-    icon: 'user',
   }));
 
   const initialAddress = keyringOptions.length > 0 ? keyringOptions[0].value : '';
 
-  // Set the initial address
   useEffect(() => {
-    // `setCurrentAccount()` is called only when currentAccount is null (uninitialized)
-    !currentAccount &&
-      initialAddress.length > 0 &&
-      setCurrentAccount(keyring.getPair(initialAddress));
+    !currentAccount && initialAddress.length > 0 && setCurrentAccount(keyring.getPair(initialAddress));
   }, [currentAccount, setCurrentAccount, keyring, initialAddress]);
 
-  const onChange = (addr: string) => {
-    setCurrentAccount(keyring.getPair(addr));
+  const onChange = (event) => {
+    setCurrentAccount(keyring.getPair(event.target.value));
   };
 
   return (
-    <Menu
-      attached="top"
-      tabular
-      style={{
-        backgroundColor: '#fff',
-        borderColor: '#fff',
-        paddingTop: '1em',
-        paddingBottom: '1em',
-      }}
-    >
-      <Container>
-        <Menu.Menu>
-          <Image src={`${process.env.PUBLIC_URL}/assets/substrate-logo.png`} size="mini" />
-        </Menu.Menu>
-        <Menu.Menu position="right" style={{ alignItems: 'center' }}>
-          {!currentAccount ? (
-            <span>
-              Create an account with Polkadot-JS Extension (
-              <a target="_blank" rel="noreferrer" href={CHROME_EXT_URL}>
-                Chrome
-              </a>
-              ,&nbsp;
-              <a target="_blank" rel="noreferrer" href={FIREFOX_ADDON_URL}>
-                Firefox
-              </a>
-              )&nbsp;
-            </span>
-          ) : null}
-          <CopyToClipboard text={acctAddr(currentAccount)}>
-            <Button
-              basic
-              circular
-              size="large"
-              icon="user"
-              color={currentAccount ? 'green' : 'red'}
-            />
-          </CopyToClipboard>
-          <Dropdown
-            search
-            selection
-            clearable
-            placeholder="Select an account"
-            options={keyringOptions}
-            onChange={(_, dropdown) => {
-              onChange(dropdown.value as string);
-            }}
-            value={acctAddr(currentAccount)}
-          />
-          <BalanceAnnotation />
-        </Menu.Menu>
+    <AppBar position="static" style={{ backgroundColor: '#fff', color: '#000', boxShadow: 'none' }}>
+      <Container maxWidth="lg">
+        <Toolbar>
+          <Grid container justifyContent="flex-start" alignItems="center" spacing={2}>
+            <Grid item>
+              <img src={`${process.env.PUBLIC_URL}/assets/substrate-logo.png`} alt="logo" style={{ width: '32px' }} />
+            </Grid>
+            <Grid item>
+              {!currentAccount ? (
+                <Typography variant="body2">
+                  Create an account with Polkadot-JS Extension (
+                  <IconButton href={CHROME_EXT_URL} target="_blank" rel="noreferrer">
+                    Chrome
+                  </IconButton>
+                  ,
+                  <IconButton href={FIREFOX_ADDON_URL} target="_blank" rel="noreferrer">
+                    Firefox
+                  </IconButton>
+                  )
+                </Typography>
+              ) : null}
+            </Grid>
+          </Grid>
+          <Grid container justifyContent="flex-end" alignItems="center" spacing={2}>
+            <Grid item>
+              <CopyToClipboard text={acctAddr(currentAccount)}>
+                <IconButton color={currentAccount ? 'success' : 'error'} size="large">
+                  <AccountCircleIcon />
+                </IconButton>
+              </CopyToClipboard>
+            </Grid>
+            <Grid item>
+              <FormControl variant="outlined" fullWidth style={{ width: '200px' }}>
+                <InputLabel>Select an account</InputLabel>
+                <Select
+                  value={acctAddr(currentAccount)}
+                  onChange={onChange}
+                  label="Select an account"
+                  style={{ minWidth: '200px' }}
+                >
+                  {keyringOptions.map((option) => (
+                    <MenuItem key={option.key} value={option.value}>
+                      {option.text}
+                    </MenuItem>
+                  ))}
+                </Select>
+              </FormControl>
+            </Grid>
+            <Grid item>
+              <BalanceAnnotation />
+            </Grid>
+          </Grid>
+        </Toolbar>
       </Container>
-    </Menu>
+    </AppBar>
   );
 }
 
-function BalanceAnnotation(props: any) {
+function BalanceAnnotation(props) {
   const { api, currentAccount } = useSubstrateState();
-  const [accountBalance, setAccountBalance] = useState<string | number>(0);
+  const [accountBalance, setAccountBalance] = useState(0);
 
-  // When account address changes, update subscriptions
   useEffect(() => {
-    let unsubscribe: (() => void) | undefined;
+    let unsubscribe;
 
-    // If the user has selected an address, create a new subscription
     currentAccount &&
       api.query.system
-        .account(acctAddr(currentAccount), (balance: { data: { free: { toHuman: () => React.SetStateAction<string | number>; }; }; }) =>
-          setAccountBalance(balance.data.free.toHuman())
-        )
-        .then((unsub: (() => void) | undefined) => (unsubscribe = unsub))
+        .account(acctAddr(currentAccount), (balance) => setAccountBalance(balance.data.free.toHuman()))
+        .then((unsub) => (unsubscribe = unsub))
         .catch(console.error);
 
     return () => unsubscribe && unsubscribe();
   }, [api, currentAccount]);
 
   return currentAccount ? (
-    <Label pointing="left">
-      <Icon name="money" color="green" />
-      {accountBalance}
-    </Label>
+    <ListItem alignItems="center" disableGutters>
+      <ListItemAvatar>
+        <Avatar>
+          <MoneyIcon color="success" />
+        </Avatar>
+      </ListItemAvatar>
+      <ListItemText primary={accountBalance} />
+    </ListItem>
   ) : null;
 }
 
-export default function AccountSelector(props: any) {
-  const { api, keyring } = useSubstrateState();
+export default function AccountSelector(props) {
+  const { keyring, api } = useSubstrateState();
   return keyring.getPairs && api.query ? <Main {...props} /> : null;
 }
