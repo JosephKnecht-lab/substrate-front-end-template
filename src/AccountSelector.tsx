@@ -52,7 +52,7 @@ function Main(props) {
   };
 
   return (
-    <AppBar position="static" style={{ backgroundColor: '#fff', color: '#000', boxShadow: 'none' }}>
+    <AppBar position="static" style={{ backgroundColor: '#E6007A', color: '#000', boxShadow: 'none' }}>
       <Container maxWidth="lg">
         <Toolbar>
           <Grid container justifyContent="flex-start" alignItems="center" spacing={2}>
