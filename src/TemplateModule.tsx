@@ -1,23 +1,23 @@
 import React, { useEffect, useState } from 'react'
 import { Form, Input, Grid, Card, Statistic } from 'semantic-ui-react'
 
-import { useSubstrateState } from './substrate-lib'
-import { TxButton } from './substrate-lib/components'
+import { useSubstrateState } from './substrate-lib/index.tsx'
+import { TxButton } from './substrate-lib/components/index.tsx'
 
-function Main(props) {
+function Main() {
   const { api } = useSubstrateState()
 
   // The transaction submission status
-  const [status, setStatus] = useState('')
+  const [status, setStatus] = useState<string>('')
 
   // The currently stored value
-  const [currentValue, setCurrentValue] = useState(0)
-  const [formValue, setFormValue] = useState(0)
+  const [currentValue, setCurrentValue] = useState<string | number>(0)
+  const [formValue, setFormValue] = useState<number>(0)
 
   useEffect(() => {
-    let unsubscribe
-    api.query.templateModule
-      .something(newValue => {
+    let unsubscribe: any
+    api?.query.templateModule
+      .something((newValue: any) => {
         // The storage value is an Option<u32>
         // So we have to check whether it is None first
         // There is also unwrapOr
@@ -33,7 +33,7 @@ function Main(props) {
       .catch(console.error)
 
     return () => unsubscribe && unsubscribe()
-  }, [api.query.templateModule])
+  }, [api?.query.templateModule])
 
   return (
     <Grid.Column width={8}>
@@ -49,7 +49,7 @@ function Main(props) {
             label="New Value"
             state="newValue"
             type="number"
-            onChange={(_, { value }) => setFormValue(value)}
+            onChange={(_, { value }) => setFormValue(+value)}
           />
         </Form.Field>
         <Form.Field style={{ textAlign: 'center' }}>
@@ -71,9 +71,9 @@ function Main(props) {
   )
 }
 
-export default function TemplateModule(props) {
+export default function TemplateModule() {
   const { api } = useSubstrateState()
-  return api.query.templateModule && api.query.templateModule.something ? (
-    <Main {...props} />
+  return api?.query.templateModule && api?.query.templateModule.something ? (
+    <Main />
   ) : null
 }

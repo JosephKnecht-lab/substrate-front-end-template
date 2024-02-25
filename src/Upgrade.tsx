@@ -1,23 +1,23 @@
-import React, { useState } from 'react'
-import { TxButton } from './substrate-lib/components'
+import React, { ChangeEvent, useState } from 'react'
+import { TxButton } from './substrate-lib/components/index.tsx'
 import { Box, InputAdornment, TextField, Typography } from '@mui/material'
-import { useThemeContext } from './theme/ThemeContextProvider'
+import { useThemeContext } from './theme/ThemeContextProvider.tsx'
 import { Form } from 'semantic-ui-react'
 
-export default function Main(props) {
-  const [status, setStatus] = useState('')
-  const [proposal, setProposal] = useState({})
+export default function Main() {
+  const [status, setStatus] = useState<string>('')
+  const [proposal, setProposal] = useState<string>('')
 
-  const bufferToHex = buffer => {
+  const bufferToHex = (buffer: ArrayBuffer) => {
     return Array.from(new Uint8Array(buffer))
       .map(b => b.toString(16).padStart(2, '0'))
       .join('')
   }
 
-  const handleFileChosen = file => {
+  const handleFileChosen = (file: File) => {
     const fileReader = new FileReader()
     fileReader.onloadend = e => {
-      const content = bufferToHex(fileReader.result)
+      const content = bufferToHex(fileReader.result as ArrayBuffer)
       setProposal(`0x${content}`)
     }
 
@@ -39,7 +39,9 @@ export default function Main(props) {
       <Form>
         <TextField
           type="file"
-          onChange={e => handleFileChosen(e.target.files[0])}
+          onChange={(e: ChangeEvent<HTMLInputElement>) =>
+            handleFileChosen(e.target.files![0])
+          }
           variant="filled"
           sx={{
             width: '100%',

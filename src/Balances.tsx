@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react'
 import { Label } from 'semantic-ui-react'
 import { CopyToClipboard } from 'react-copy-to-clipboard'
-import { useSubstrateState } from './substrate-lib'
+import { useSubstrateState } from './substrate-lib/index.tsx'
 import {
   Table,
   TableBody,
@@ -15,12 +15,18 @@ import {
 } from '@mui/material'
 import { makeStyles } from '@material-ui/core/styles'
 import { FileCopy } from '@mui/icons-material'
-import { useThemeContext } from './theme/ThemeContextProvider'
+import { useThemeContext } from './theme/ThemeContextProvider.tsx'
+import { KeyringPair } from '@polkadot/keyring/types'
+import { VoidFn } from '@polkadot/api/types'
 
-export default function Main(props) {
+interface Balances {
+  [key: string]: string
+}
+
+export default function Main() {
   const { api, keyring } = useSubstrateState()
-  const accounts = keyring.getPairs()
-  const [balances, setBalances] = useState({})
+  const accounts: KeyringPair[] = keyring?.getPairs()
+  const [balances, setBalances] = useState<Balances>({})
 
   const { mode } = useThemeContext()
 
@@ -42,15 +48,17 @@ export default function Main(props) {
   const classes = useStyles()
 
   useEffect(() => {
-    const addresses = keyring.getPairs().map(account => account.address)
-    let unsubscribeAll = null
+    const addresses: string[] = keyring
+      ?.getPairs()
+      .map((account: KeyringPair) => account.address)
+    let unsubscribeAll: VoidFn
 
-    api.query.system.account
+    api?.query.system.account
       .multi(addresses, balances => {
         const balancesMap = addresses.reduce(
           (acc, address, index) => ({
             ...acc,
-            [address]: balances[index].data.free.toHuman(),
+            [address]: (balances[index] as any)?.data.free.toHuman(),
           }),
           {}
         )
@@ -112,6 +120,7 @@ export default function Main(props) {
                     >
                       {account.address}
                     </span>
+                    {/* @ts-ignore */}
                     <CopyToClipboard text={account.address}>
                       <IconButton sx={{ ml: 4 }}>
                         <FileCopy color="primary" fontSize="small" />

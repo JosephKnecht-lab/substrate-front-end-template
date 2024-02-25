@@ -1,19 +1,15 @@
-// import { PaletteMode } from "@mui/material";
-// import { amber, deepOrange, grey, pink, yellow } from "@mui/material/colors";
-
-import { createTheme } from '@mui/material'
+import { createTheme, PaletteMode } from '@mui/material'
 import { pink } from '@mui/material/colors'
 
 const baseTheme = {
   palette: {
     primary: {
-      main: '#d33079',
+      main: '#7FFFD4',
     },
   },
 }
 
-// export const getDesignTokens = (mode: PaletteMode) => ({
-export const getDesignTokens = mode => ({
+export const getDesignTokens = (mode: PaletteMode) => ({
   palette: {
     mode,
     ...(mode === 'light'

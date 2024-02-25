@@ -2,6 +2,8 @@
 //   and will always cause `SyntaxError: Cannot use import statement outside a module`.
 // See: https://github.com/polkadot-js/api/issues/3430
 
+import { describe, it } from 'node:test'
+
 // import React from 'react';
 // import ReactDOM from 'react-dom';
 // import App from '../App';

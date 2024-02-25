@@ -7,21 +7,24 @@ import { ThemeProvider, Grid as MUIGrid } from '@mui/material'
 import {
   useThemeContext,
   ThemeContextProvider,
-} from './theme/ThemeContextProvider'
+} from './theme/ThemeContextProvider.tsx'
 
-import { SubstrateContextProvider, useSubstrateState } from './substrate-lib'
-import { DeveloperConsole } from './substrate-lib/components'
+import {
+  SubstrateContextProvider,
+  useSubstrateState,
+} from './substrate-lib/index.tsx'
+import { DeveloperConsole } from './substrate-lib/components/index.tsx'
 
-import AccountSelector from './AccountSelector'
-import Balances from './Balances'
-import BlockNumber from './BlockNumber'
-import Events from './Events'
-import Interactor from './Interactor'
-import Metadata from './Metadata'
-import NodeInfo from './NodeInfo'
-import TemplateModule from './TemplateModule'
-import Transfer from './Transfer'
-import Upgrade from './Upgrade'
+import AccountSelector from './AccountSelector.tsx'
+import Balances from './Balances.tsx'
+import BlockNumber from './BlockNumber.tsx'
+import Events from './Events.tsx'
+import Interactor from './Interactor.tsx'
+import Metadata from './Metadata.tsx'
+import NodeInfo from './NodeInfo.tsx'
+import TemplateModule from './TemplateModule.tsx'
+import Transfer from './Transfer.tsx'
+import Upgrade from './Upgrade.tsx'
 
 function Main() {
   const { apiState, apiError, keyringState } = useSubstrateState()
@@ -29,13 +32,13 @@ function Main() {
 
   console.log('mode', mode)
 
-  const loader = text => (
+  const loader = (text: string) => (
     <Dimmer active>
       <Loader size="small">{text}</Loader>
     </Dimmer>
   )
 
-  const message = errObj => (
+  const message = (errObj: { target: { url: string } }) => (
     <Grid centered columns={2} padded>
       <Grid.Column>
         <Message
@@ -61,7 +64,7 @@ function Main() {
   const contextRef = createRef()
 
   return (
-    <div ref={contextRef}>
+    <div ref={contextRef as React.RefObject<HTMLDivElement>}>
       <ThemeProvider theme={theme}>
         <Box
           sx={{
@@ -77,7 +80,7 @@ function Main() {
               <MUIGrid container spacing={2} sx={{ mt: '35px' }}>
                 <NodeInfo />
                 <Metadata />
-                <BlockNumber />
+                <BlockNumber finalized={false} />
                 <BlockNumber finalized />
               </MUIGrid>
               <Balances />

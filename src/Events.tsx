@@ -1,29 +1,36 @@
 import React, { useEffect, useState } from 'react'
 
-import { useSubstrateState } from './substrate-lib'
+import { useSubstrateState } from './substrate-lib/index.tsx'
 import { Box, IconButton, Paper, Typography } from '@mui/material'
 import { LayersClear } from '@mui/icons-material'
-import { useThemeContext } from './theme/ThemeContextProvider'
+import { useThemeContext } from './theme/ThemeContextProvider.tsx'
 
 // Events to be filtered from feed
 const FILTERED_EVENTS = [
   'system:ExtrinsicSuccess::(phase={"applyExtrinsic":0})',
 ]
 
-const eventName = ev => `${ev.section}:${ev.method}`
-const eventParams = ev => JSON.stringify(ev.data)
+interface EventsProps {
+  key: number
+  icon: string
+  summary: string
+  content: string
+}
 
-function Main(props) {
+const eventName = (ev: any) => `${ev.section}:${ev.method}`
+const eventParams = (ev: any) => JSON.stringify(ev.data)
+
+function Main() {
   const { api } = useSubstrateState()
-  const [eventFeed, setEventFeed] = useState([])
+  const [eventFeed, setEventFeed] = useState<EventsProps[]>([])
 
   useEffect(() => {
-    let unsub = null
+    let unsub: any = null
     let keyNum = 0
     const allEvents = async () => {
-      unsub = await api.query.system.events(events => {
+      unsub = await api?.query.system.events((events: any) => {
         // loop through the Vec<EventRecord>
-        events.forEach(record => {
+        events.forEach((record: any) => {
           // extract the phase, event and the event types
           const { event, phase } = record
 
@@ -52,7 +59,7 @@ function Main(props) {
 
     allEvents()
     return () => unsub && unsub()
-  }, [api.query.system])
+  }, [api?.query.system])
 
   const { mode } = useThemeContext()
 
@@ -121,9 +128,9 @@ function Main(props) {
   )
 }
 
-export default function Events(props) {
+export default function Events() {
   const { api } = useSubstrateState()
-  return api.query && api.query.system && api.query.system.events ? (
-    <Main {...props} />
+  return api?.query && api?.query.system && api?.query.system.events ? (
+    <Main />
   ) : null
 }

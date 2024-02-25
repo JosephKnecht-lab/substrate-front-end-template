@@ -1,20 +1,36 @@
 import React, { useReducer, useContext, useEffect } from 'react'
-import PropTypes from 'prop-types'
 import jsonrpc from '@polkadot/types/interfaces/jsonrpc'
 import { ApiPromise, WsProvider } from '@polkadot/api'
 import { web3Accounts, web3Enable } from '@polkadot/extension-dapp'
 import { keyring as Keyring } from '@polkadot/ui-keyring'
 import { isTestChain } from '@polkadot/util'
 import { TypeRegistry } from '@polkadot/types/create'
+import { Dispatch } from 'react'
 
-import config from '../config'
+import config from '../config/index.ts'
 
 const parsedQuery = new URLSearchParams(window.location.search)
 const connectedSocket = parsedQuery.get('rpc') || config.PROVIDER_SOCKET
 ///
 // Initial state for `useReducer`
 
-const initialState = {
+interface State {
+  socket: string
+  jsonrpc: any
+  keyring: any
+  keyringState: string | null
+  api: ApiPromise | null
+  apiError: any
+  apiState: string | null
+  currentAccount: any
+}
+
+interface Action {
+  type: string
+  payload?: any
+}
+
+const initialState: State = {
   // These are the states
   socket: connectedSocket,
   jsonrpc: { ...jsonrpc, ...config.CUSTOM_RPC_METHODS },
@@ -31,7 +47,7 @@ const registry = new TypeRegistry()
 ///
 // Reducer function for `useReducer`
 
-const reducer = (state, action) => {
+const reducer = (state: State, action: Action): State => {
   switch (action.type) {
     case 'CONNECT_INIT':
       return { ...state, apiState: 'CONNECT_INIT' }
@@ -57,7 +73,7 @@ const reducer = (state, action) => {
 ///
 // Connecting to the Substrate node
 
-const connect = (state, dispatch) => {
+const connect = (state: State, dispatch: Dispatch<Action>): void => {
   const { apiState, socket, jsonrpc } = state
   // We only want this function to be performed once
   if (apiState) return
@@ -78,7 +94,7 @@ const connect = (state, dispatch) => {
   _api.on('error', err => dispatch({ type: 'CONNECT_ERROR', payload: err }))
 }
 
-const retrieveChainInfo = async api => {
+const retrieveChainInfo = async (api: any) => {
   const [systemChain, systemChainType] = await Promise.all([
     api.rpc.system.chain(),
     api.rpc.system.chainType
@@ -94,7 +110,7 @@ const retrieveChainInfo = async api => {
 
 ///
 // Loading accounts from dev and polkadot-js extension
-const loadAccounts = (state, dispatch) => {
+const loadAccounts = (state: State, dispatch: Dispatch<Action>): void => {
   const { api } = state
   dispatch({ type: 'LOAD_KEYRING' })
 
@@ -116,7 +132,7 @@ const loadAccounts = (state, dispatch) => {
         systemChainType.isLocal ||
         isTestChain(systemChain)
 
-      Keyring.loadAll({ isDevelopment }, allAccounts)
+      Keyring.loadAll({ isDevelopment }, allAccounts as any)
 
       dispatch({ type: 'SET_KEYRING', payload: Keyring })
     } catch (e) {
@@ -127,17 +143,29 @@ const loadAccounts = (state, dispatch) => {
   asyncLoadAccounts()
 }
 
-const SubstrateContext = React.createContext()
+interface SubtrateContextType {
+  state: State
+  setCurrentAccount: (acct: any) => void
+}
+
+const SubstrateContext = React.createContext<SubtrateContextType>({
+  state: initialState,
+  setCurrentAccount: () => {},
+})
 
 let keyringLoadAll = false
 
-const SubstrateContextProvider = props => {
-  const neededPropNames = ['socket']
-  neededPropNames.forEach(key => {
-    initialState[key] =
-      typeof props[key] === 'undefined' ? initialState[key] : props[key]
-  })
+interface SubstrateContextProviderProps {
+  socket?: string
+  children: React.ReactNode
+}
 
+const SubstrateContextProvider: React.FC<
+  SubstrateContextProviderProps
+> = props => {
+  const key = 'socket'
+  initialState[key] =
+    typeof props[key] === 'undefined' ? initialState[key] : props[key]
   const [state, dispatch] = useReducer(reducer, initialState)
   connect(state, dispatch)
 
@@ -149,7 +177,7 @@ const SubstrateContextProvider = props => {
     }
   }, [state, dispatch])
 
-  function setCurrentAccount(acct) {
+  function setCurrentAccount(acct: any) {
     dispatch({ type: 'SET_CURRENT_ACCOUNT', payload: acct })
   }
 
@@ -158,11 +186,6 @@ const SubstrateContextProvider = props => {
       {props.children}
     </SubstrateContext.Provider>
   )
-}
-
-// prop typechecking
-SubstrateContextProvider.propTypes = {
-  socket: PropTypes.string,
 }
 
 const useSubstrate = () => useContext(SubstrateContext)

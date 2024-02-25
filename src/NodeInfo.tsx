@@ -1,30 +1,39 @@
 import React, { useEffect, useState } from 'react'
-// import { Card, Icon, Grid } from 'semantic-ui-react'
 
-import { useSubstrateState } from './substrate-lib'
+import { useSubstrateState } from './substrate-lib/index.tsx'
 import { Card, CardContent, Grid, Divider, Typography } from '@mui/material'
 import { Settings } from '@mui/icons-material'
-import { useThemeContext } from './theme/ThemeContextProvider'
+import { useThemeContext } from './theme/ThemeContextProvider.tsx'
 
-function Main(props) {
+interface NodeInfoProps {
+  chain?: string | undefined
+  nodeName?: string
+  nodeVersion?: string
+}
+
+const Main: React.FC = () => {
   const { api, socket } = useSubstrateState()
-  const [nodeInfo, setNodeInfo] = useState({})
+  const [nodeInfo, setNodeInfo] = useState<NodeInfoProps>({})
 
   useEffect(() => {
     const getInfo = async () => {
       try {
         const [chain, nodeName, nodeVersion] = await Promise.all([
-          api.rpc.system.chain(),
-          api.rpc.system.name(),
-          api.rpc.system.version(),
+          api?.rpc.system.chain(),
+          api?.rpc.system.name(),
+          api?.rpc.system.version(),
         ])
-        setNodeInfo({ chain, nodeName, nodeVersion })
+        setNodeInfo({
+          chain: chain?.toString(),
+          nodeName: nodeName?.toString(),
+          nodeVersion: nodeVersion?.toString(),
+        })
       } catch (e) {
         console.error(e)
       }
     }
     getInfo()
-  }, [api.rpc.system])
+  }, [api?.rpc.system])
 
   const { mode } = useThemeContext()
 
@@ -94,13 +103,9 @@ function Main(props) {
   )
 }
 
-export default function NodeInfo(props) {
+const NodeInfo: React.FC = props => {
   const { api } = useSubstrateState()
-  return api.rpc &&
-    api.rpc.system &&
-    api.rpc.system.chain &&
-    api.rpc.system.name &&
-    api.rpc.system.version ? (
-    <Main {...props} />
-  ) : null
+  return api?.rpc && api?.rpc.system ? <Main {...props} /> : null
 }
+
+export default NodeInfo

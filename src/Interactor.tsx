@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from 'react'
 import { Form } from 'semantic-ui-react'
 
-import { useSubstrateState } from './substrate-lib'
-import { TxButton, TxGroupButton } from './substrate-lib/components'
+import { useSubstrateState } from './substrate-lib/index.tsx'
+import { TxButton, TxGroupButton } from './substrate-lib/components/index.tsx'
 import {
   Box,
   FormControl,
@@ -12,27 +12,41 @@ import {
   Radio,
   RadioGroup,
   Select,
+  SelectChangeEvent,
   TextField,
   Typography,
 } from '@mui/material'
 import { KeyboardArrowDown } from '@mui/icons-material'
-import { useThemeContext } from './theme/ThemeContextProvider'
+import { useThemeContext } from './theme/ThemeContextProvider.tsx'
 import { makeStyles } from '@material-ui/core'
+import { ApiPromise } from '@polkadot/api'
 
-const argIsOptional = arg => arg.type.toString().startsWith('Option<')
+const argIsOptional = (arg: any) => arg.type.toString().startsWith('Option<')
 
-function Main(props) {
+interface FormState {
+  palletRpc: string
+  callable: string
+  inputParams: Array<{ type: string; value: string }>
+}
+
+function Main() {
   const { api, jsonrpc } = useSubstrateState()
-  const [status, setStatus] = useState(null)
+  const [status, setStatus] = useState<string | null>(null)
 
-  const [interxType, setInterxType] = useState('EXTRINSIC')
-  const [palletRPCs, setPalletRPCs] = useState([])
-  const [callables, setCallables] = useState([])
-  const [paramFields, setParamFields] = useState([])
-  const [palletDropdownLabel, setPalletDropdownLabel] = useState('')
-  const [callableDropdownLabel, setCallableDropdownLabel] = useState('')
+  const [interxType, setInterxType] = useState<string>('EXTRINSIC')
+  const [palletRPCs, setPalletRPCs] = useState<
+    Array<{ key: string; value: string; text: string }>
+  >([])
+  const [callables, setCallables] = useState<
+    Array<{ key: string; value: string; text: string }>
+  >([])
+  const [paramFields, setParamFields] = useState<
+    Array<{ name: string; type: string; optional: boolean }>
+  >([])
+  const [palletDropdownLabel, setPalletDropdownLabel] = useState<string>('')
+  const [callableDropdownLabel, setCallableDropdownLabel] = useState<string>('')
 
-  const initFormState = {
+  const initFormState: FormState = {
     palletRpc: '',
     callable: '',
     inputParams: [],
@@ -41,7 +55,7 @@ function Main(props) {
   const [formState, setFormState] = useState(initFormState)
   const { palletRpc, callable, inputParams } = formState
 
-  const getApiType = (api, interxType) => {
+  const getApiType = (api: ApiPromise, interxType: string) => {
     if (interxType === 'QUERY') {
       return api.query
     } else if (interxType === 'EXTRINSIC') {
@@ -57,7 +71,7 @@ function Main(props) {
     if (!api) {
       return
     }
-    const apiType = getApiType(api, interxType)
+    const apiType = getApiType(api, interxType) as Record<string, any>
     const palletRPCs = Object.keys(apiType)
       .sort()
       .filter(pr => Object.keys(apiType[pr]).length > 0)
@@ -69,7 +83,9 @@ function Main(props) {
     if (!api || palletRpc === '') {
       return
     }
-    const callables = Object.keys(getApiType(api, interxType)[palletRpc])
+    const callables = Object.keys(
+      (getApiType(api, interxType) as any)[palletRpc]
+    )
       .sort()
       .map(c => ({ key: c, value: c, text: c }))
     setCallables(callables)
@@ -84,7 +100,8 @@ function Main(props) {
     let paramFields = []
 
     if (interxType === 'QUERY') {
-      const metaType = api.query[palletRpc][callable].meta.type
+      // @ts-ignore
+      const metaType = api.query[palletRpc][callable]?.meta.type
       if (metaType.isPlain) {
         // Do nothing as `paramFields` is already set to []
       } else if (metaType.isMap) {
@@ -127,7 +144,7 @@ function Main(props) {
       }
 
       if (metaParam.length > 0) {
-        paramFields = metaParam.map(arg => ({
+        paramFields = metaParam.map((arg: any) => ({
           name: arg.name,
           type: arg.type,
           optional: arg.isOptional || false,
@@ -144,8 +161,13 @@ function Main(props) {
   useEffect(updateCallables, [api, interxType, palletRpc])
   useEffect(updateParamFields, [api, interxType, palletRpc, callable, jsonrpc])
 
-  const onPalletCallableParamChange = (_, data) => {
-    setFormState(formState => {
+  const onPalletCallableParamChange = (
+    _:
+      | React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+      | SelectChangeEvent<string>,
+    data: any
+  ) => {
+    setFormState((formState: any) => {
       let res
       const { state, value } = data
       if (typeof state === 'object') {
@@ -166,7 +188,7 @@ function Main(props) {
     })
   }
 
-  const onInterxTypeChange = e => {
+  const onInterxTypeChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setInterxType(e.target.value)
     // clear the formState
     setFormState(initFormState)
@@ -386,16 +408,6 @@ function Main(props) {
               ),
             }}
           />
-          // <Form.Field key={`${paramField.name}-${paramField.type}`}>
-          //   <Input
-          //     placeholder={paramField.type}
-          //     fluid
-          //     type="text"
-          //     label={paramField.name}
-          //     state={{ ind, paramField }}
-          //     value={inputParams[ind] ? inputParams[ind].value : ''}
-          //     onChange={onPalletCallableParamChange}
-          //   />
           //   {paramField.optional ? (
           //     <Label
           //       basic
@@ -404,7 +416,6 @@ function Main(props) {
           //       content={getOptionalMsg(interxType)}
           //     />
           //   ) : null}
-          // </Form.Field>
         ))}
         <InteractorSubmit
           setStatus={setStatus}
@@ -422,7 +433,7 @@ function Main(props) {
   )
 }
 
-function InteractorSubmit(props) {
+function InteractorSubmit(props: any) {
   const {
     attrs: { interxType },
   } = props
@@ -434,10 +445,14 @@ function InteractorSubmit(props) {
     return (
       <TxButton label="Submit" type={interxType} color="primary" {...props} />
     )
+  } else {
+    return (
+      <TxButton label="Submit" type={interxType} color="primary" {...props} />
+    )
   }
 }
 
-export default function Interactor(props) {
+export default function Interactor(props: any) {
   const { api } = useSubstrateState()
-  return api.tx ? <Main {...props} /> : null
+  return api?.tx ? <Main {...props} /> : null
 }

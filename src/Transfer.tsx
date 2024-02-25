@@ -1,7 +1,7 @@
 import React, { useState } from 'react'
 import { Form } from 'semantic-ui-react'
-import { TxButton } from './substrate-lib/components'
-import { useSubstrateState } from './substrate-lib'
+import { TxButton } from './substrate-lib/components/index.tsx'
+import { useSubstrateState } from './substrate-lib/index.tsx'
 import {
   Box,
   InputAdornment,
@@ -11,12 +11,26 @@ import {
   Typography,
 } from '@mui/material'
 import { ArrowRightAlt, KeyboardArrowDown } from '@mui/icons-material'
-import { useThemeContext } from './theme/ThemeContextProvider'
+import { useThemeContext } from './theme/ThemeContextProvider.tsx'
 import { makeStyles } from '@material-ui/core'
 
-export default function Main(props) {
-  const [status, setStatus] = useState(null)
-  const [formState, setFormState] = useState({ addressTo: '', amount: 0 })
+interface Account {
+  key: string
+  text: string
+  value: string
+}
+
+interface FormState {
+  addressTo: string
+  amount: number
+}
+
+export default function Main() {
+  const [status, setStatus] = useState<string | null>(null)
+  const [formState, setFormState] = useState<FormState>({
+    addressTo: '',
+    amount: 0,
+  })
 
   // const onChange = (_, data) =>
   //   setFormState(prev => ({ ...prev, [data.state]: data.value }))
@@ -39,10 +53,10 @@ export default function Main(props) {
   const { addressTo, amount } = formState
 
   const { keyring } = useSubstrateState()
-  const accounts = keyring.getPairs()
+  const accounts = keyring?.getPairs()
 
-  const availableAccounts = []
-  accounts.map(account => {
+  const availableAccounts: Account[] = []
+  accounts?.map((account: any) => {
     return availableAccounts.push({
       key: account.meta.name,
       text: account.meta.name,
@@ -50,7 +64,7 @@ export default function Main(props) {
     })
   })
 
-  const [dropdownLabel, setDropdownLabel] = useState('')
+  const [dropdownLabel, setDropdownLabel] = useState<string>('')
 
   return (
     <Box>
@@ -189,7 +203,9 @@ export default function Main(props) {
 
         <TextField
           type="number"
-          onChange={e => setFormState({ ...formState, amount: e.target.value })}
+          onChange={e =>
+            setFormState({ ...formState, amount: +e.target.value })
+          }
           variant="filled"
           sx={{
             width: '100%',

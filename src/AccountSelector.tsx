@@ -1,35 +1,55 @@
 import React, { useState, useEffect } from 'react'
-// import { CopyToClipboard } from 'react-copy-to-clipboard'
+import { CopyToClipboard } from 'react-copy-to-clipboard'
 
 import { Icon, Label } from 'semantic-ui-react'
 
 import Switch from '@mui/material/Switch'
-import { useThemeContext } from './theme/ThemeContextProvider'
+import { useThemeContext } from './theme/ThemeContextProvider.tsx'
 
-import { useSubstrate, useSubstrateState } from './substrate-lib'
-import { Avatar, Box, IconButton, Typography } from '@mui/material'
-import { Apps, Notifications } from '@mui/icons-material'
+import { useSubstrate, useSubstrateState } from './substrate-lib/index.tsx'
+import {
+  Avatar,
+  Box,
+  IconButton,
+  MenuItem,
+  Select,
+  Typography,
+} from '@mui/material'
+import {
+  Apps,
+  Notifications,
+  SupervisedUserCircleOutlined,
+} from '@mui/icons-material'
+
+interface KeyRingOptionProps {
+  key: string
+  value: string
+  text: string
+  icon: string
+}
 
 const CHROME_EXT_URL =
   'https://chrome.google.com/webstore/detail/polkadot%7Bjs%7D-extension/mopnmbcafieddcagagdcbnhejhlodfdd'
 const FIREFOX_ADDON_URL =
   'https://addons.mozilla.org/en-US/firefox/addon/polkadot-js-extension/'
 
-const acctAddr = acct => (acct ? acct.address : '')
+const acctAddr = (acct: any) => (acct ? acct.address : '')
 
-function Main(props) {
+function Main() {
   const {
     setCurrentAccount,
     state: { keyring, currentAccount },
   } = useSubstrate()
 
   // Get the list of accounts we possess the private key for
-  const keyringOptions = keyring.getPairs().map(account => ({
-    key: account.address,
-    value: account.address,
-    text: account.meta.name.toUpperCase(),
-    icon: 'user',
-  }))
+  const keyringOptions: KeyRingOptionProps[] = keyring
+    .getPairs()
+    .map((account: any) => ({
+      key: account.address,
+      value: account.address,
+      text: account.meta.name.toUpperCase(),
+      icon: 'user',
+    }))
 
   const initialAddress =
     keyringOptions.length > 0 ? keyringOptions[0].value : ''
@@ -42,9 +62,9 @@ function Main(props) {
       setCurrentAccount(keyring.getPair(initialAddress))
   }, [currentAccount, setCurrentAccount, keyring, initialAddress])
 
-  // const onChange = addr => {
-  //   setCurrentAccount(keyring.getPair(addr))
-  // }
+  const onChange = (addr: string) => {
+    setCurrentAccount(keyring.getPair(addr))
+  }
 
   // const { theme, toggleColorMode } = useThemeContext()
   const { toggleColorMode, mode } = useThemeContext()
@@ -73,7 +93,11 @@ function Main(props) {
       />
       <Box sx={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
         {!currentAccount && (
-          <Typography variant="body2" component={'span'}>
+          <Typography
+            variant="body2"
+            component={'span'}
+            color={mode === 'light' ? '#3f3f3f' : '#b8b3b9'}
+          >
             Create an account with Polkadot js extension{' '}
             <span>
               <a
@@ -99,41 +123,54 @@ function Main(props) {
         <IconButton sx={{ p: 0.2 }}>
           <Notifications sx={{ color: '#899fb5' }} />
         </IconButton>
-        <IconButton sx={{ p: 0.2 }}>
-          <Apps sx={{ color: '#899fb5' }} />
-        </IconButton>
+        <CopyToClipboard text={acctAddr(currentAccount)}>
+          <IconButton sx={{ p: 0.2 }}>
+            <Apps sx={{ color: '#899fb5' }} />
+          </IconButton>
+        </CopyToClipboard>
         <BalanceAnnotation />
 
-        <Box
-          sx={{
-            px: 1.5,
-            py: 1,
-            border: '1px solid #d8dfe9',
-            borderRadius: '50px',
-            display: 'flex',
-            alignItems: 'center',
-            gap: '10px',
-          }}
-        >
-          <Typography
-            variant="body2"
-            component={'span'}
-            sx={{ color: '#5f7485', fontWeight: '600', fontSize: '12px' }}
-          >
-            User PolkaDot
-          </Typography>
-          <Avatar
-            alt="Rayyaan"
-            sx={{
-              backgroundColor: 'Highlight',
-              width: '26px',
-              height: '26px',
-              fontSize: '16px',
-            }}
-          >
-            R
-          </Avatar>
-        </Box>
+        {currentAccount && (
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+            <Select
+              labelId="demo-simple-select-label"
+              id="demo-simple-select"
+              sx={{
+                fontSize: '13px',
+                py: 0,
+                px: 0,
+                borderRadius: '50px',
+              }}
+              value={acctAddr(currentAccount)}
+              onChange={(event: any) => {
+                onChange(event.target.value)
+              }}
+            >
+              {keyringOptions.map((option, index) => (
+                <MenuItem
+                  sx={{
+                    fontSize: '13px',
+                  }}
+                  key={index}
+                  value={option.value}
+                >
+                  {option.text}
+                </MenuItem>
+              ))}
+            </Select>
+            <Avatar
+              alt="Rayyaan"
+              sx={{
+                backgroundColor: 'primary.main',
+                width: '40px',
+                height: '40px',
+                fontSize: '16px',
+              }}
+            >
+              <SupervisedUserCircleOutlined />
+            </Avatar>
+          </Box>
+        )}
       </Box>
     </Box>
 
@@ -196,18 +233,18 @@ function Main(props) {
   )
 }
 
-function BalanceAnnotation(props) {
+function BalanceAnnotation() {
   const { api, currentAccount } = useSubstrateState()
   const [accountBalance, setAccountBalance] = useState(0)
 
   // When account address changes, update subscriptions
   useEffect(() => {
-    let unsubscribe
+    let unsubscribe: any
 
     // If the user has selected an address, create a new subscription
     currentAccount &&
-      api.query.system
-        .account(acctAddr(currentAccount), balance =>
+      api?.query.system
+        .account(acctAddr(currentAccount), (balance: any) =>
           setAccountBalance(balance.data.free.toHuman())
         )
         .then(unsub => (unsubscribe = unsub))
@@ -224,7 +261,7 @@ function BalanceAnnotation(props) {
   ) : null
 }
 
-export default function AccountSelector(props) {
+export default function AccountSelector() {
   const { api, keyring } = useSubstrateState()
-  return keyring.getPairs && api.query ? <Main {...props} /> : null
+  return keyring.getPairs && api?.query ? <Main /> : null
 }

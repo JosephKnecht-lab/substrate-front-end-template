@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react'
 
-import { useSubstrateState } from './substrate-lib'
+import { useSubstrateState } from './substrate-lib/index.tsx'
 import {
   Box,
   Card,
@@ -10,30 +10,37 @@ import {
   Typography,
 } from '@mui/material'
 import { Timer } from '@mui/icons-material'
-import { useThemeContext } from './theme/ThemeContextProvider'
+import { useThemeContext } from './theme/ThemeContextProvider.tsx'
+import { VoidFn } from '@polkadot/api/types'
 
-function Main(props) {
+interface MainProps {
+  finalized: boolean
+}
+
+const Main: React.FC<MainProps> = props => {
   const { api } = useSubstrateState()
   const { finalized } = props
-  const [blockNumber, setBlockNumber] = useState(0)
-  const [blockNumberTimer, setBlockNumberTimer] = useState(0)
+  const [blockNumber, setBlockNumber] = useState<string | number>(0)
+  const [blockNumberTimer, setBlockNumberTimer] = useState<number>(0)
 
   const bestNumber = finalized
-    ? api.derive.chain.bestNumberFinalized
-    : api.derive.chain.bestNumber
+    ? api?.derive.chain.bestNumberFinalized
+    : api?.derive.chain.bestNumber
 
   useEffect(() => {
-    let unsubscribeAll = null
+    let unsubscribeAll: VoidFn
 
-    bestNumber(number => {
-      // Append `.toLocaleString('en-US')` to display a nice thousand-separated digit.
-      setBlockNumber(number.toNumber().toLocaleString('en-US'))
-      setBlockNumberTimer(0)
-    })
-      .then(unsub => {
-        unsubscribeAll = unsub
+    if (bestNumber) {
+      bestNumber(number => {
+        // Append `.toLocaleString('en-US')` to display a nice thousand-separated digit.
+        setBlockNumber(number.toNumber().toLocaleString('en-US'))
+        setBlockNumberTimer(0)
       })
-      .catch(console.error)
+        .then(unsub => {
+          unsubscribeAll = unsub
+        })
+        .catch(console.error)
+    }
 
     return () => unsubscribeAll && unsubscribeAll()
   }, [bestNumber])
@@ -120,12 +127,7 @@ function Main(props) {
   )
 }
 
-export default function BlockNumber(props) {
+export default function BlockNumber(props: MainProps) {
   const { api } = useSubstrateState()
-  return api.derive &&
-    api.derive.chain &&
-    api.derive.chain.bestNumber &&
-    api.derive.chain.bestNumberFinalized ? (
-    <Main {...props} />
-  ) : null
+  return api?.derive && api?.derive.chain ? <Main {...props} /> : null
 }
