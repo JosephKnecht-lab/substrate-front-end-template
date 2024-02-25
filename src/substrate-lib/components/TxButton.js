@@ -1,15 +1,15 @@
 import React, { useState, useEffect } from 'react'
 import PropTypes from 'prop-types'
-import { Button } from 'semantic-ui-react'
 import { web3FromSource } from '@polkadot/extension-dapp'
 
 import { useSubstrateState } from '../'
 import utils from '../utils'
-import { bnFromHex } from '@polkadot/util';
+import { bnFromHex } from '@polkadot/util'
+import { Box, Button } from '@mui/material'
 
 function TxButton({
   attrs = null,
-  color = 'blue',
+  color = 'primary',
   disabled = false,
   label,
   setStatus,
@@ -60,43 +60,50 @@ function TxButton({
     return [address, { signer: injector.signer }]
   }
 
-  const txResHandler = ({ events = [], status, txHash }) =>{
+  const txResHandler = ({ events = [], status, txHash }) => {
     status.isFinalized
       ? setStatus(`😉 Finalized. Block hash: ${status.asFinalized.toString()}`)
       : setStatus(`Current transaction status: ${status.type}`)
 
-      // Loop through Vec<EventRecord> to display all events
-      events.forEach(({ _, event: { data, method, section } }) => {
-        if ((section + ":" + method) === 'system:ExtrinsicFailed' ) {
-          // extract the data for this event
-          const [dispatchError, dispatchInfo] = data;
-          console.log(`dispatchinfo: ${dispatchInfo}`)
-          let errorInfo;
-          
-          // decode the error
-          if (dispatchError.isModule) {
-            // for module errors, we have the section indexed, lookup
-            // (For specific known errors, we can also do a check against the
-            // api.errors.<module>.<ErrorName>.is(dispatchError.asModule) guard)
-            const mod = dispatchError.asModule
-            const error = api.registry.findMetaError(
-                new Uint8Array([mod.index.toNumber(), bnFromHex(mod.error.toHex().slice(0, 4)).toNumber()])
-            )
-            let message = `${error.section}.${error.name}${
-                Array.isArray(error.docs) ? `(${error.docs.join('')})` : error.docs || ''
-            }`
-            
-            errorInfo = `${message}`;
-            console.log(`Error-info::${JSON.stringify(error)}`)
-          } else {
-            // Other, CannotLookup, BadOrigin, no extra info
-            errorInfo = dispatchError.toString();
-          }
-          setStatus(`😞 Transaction Failed! ${section}.${method}::${errorInfo}`)
-        } else if (section + ":" + method === 'system:ExtrinsicSuccess' ) {
-          setStatus(`❤️️ Transaction successful! tx hash: ${txHash} , Block hash: ${status.asFinalized.toString()}`)
+    // Loop through Vec<EventRecord> to display all events
+    events.forEach(({ _, event: { data, method, section } }) => {
+      if (section + ':' + method === 'system:ExtrinsicFailed') {
+        // extract the data for this event
+        const [dispatchError, dispatchInfo] = data
+        console.log(`dispatchinfo: ${dispatchInfo}`)
+        let errorInfo
+
+        // decode the error
+        if (dispatchError.isModule) {
+          // for module errors, we have the section indexed, lookup
+          // (For specific known errors, we can also do a check against the
+          // api.errors.<module>.<ErrorName>.is(dispatchError.asModule) guard)
+          const mod = dispatchError.asModule
+          const error = api.registry.findMetaError(
+            new Uint8Array([
+              mod.index.toNumber(),
+              bnFromHex(mod.error.toHex().slice(0, 4)).toNumber(),
+            ])
+          )
+          let message = `${error.section}.${error.name}${
+            Array.isArray(error.docs)
+              ? `(${error.docs.join('')})`
+              : error.docs || ''
+          }`
+
+          errorInfo = `${message}`
+          console.log(`Error-info::${JSON.stringify(error)}`)
+        } else {
+          // Other, CannotLookup, BadOrigin, no extra info
+          errorInfo = dispatchError.toString()
         }
-      });
+        setStatus(`😞 Transaction Failed! ${section}.${method}::${errorInfo}`)
+      } else if (section + ':' + method === 'system:ExtrinsicSuccess') {
+        setStatus(
+          `❤️️ Transaction successful! tx hash: ${txHash} , Block hash: ${status.asFinalized.toString()}`
+        )
+      }
+    })
   }
 
   const txErrHandler = err =>
@@ -297,9 +304,10 @@ function TxButton({
 
   return (
     <Button
-      basic
-      color={color}
-      style={style}
+      color={'primary'}
+      variant="contained"
+      // style={style}
+      sx={{ textTransform: 'capitalize' }}
       type="submit"
       onClick={transaction}
       disabled={
@@ -339,13 +347,13 @@ TxButton.propTypes = {
 
 function TxGroupButton(props) {
   return (
-    <Button.Group>
+    <Box sx={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
       <TxButton label="Unsigned" type="UNSIGNED-TX" color="grey" {...props} />
-      <Button.Or />
+      {/* <Button.Or /> */}
       <TxButton label="Signed" type="SIGNED-TX" color="blue" {...props} />
-      <Button.Or />
+      {/* <Button.Or /> */}
       <TxButton label="SUDO" type="SUDO-TX" color="red" {...props} />
-    </Button.Group>
+    </Box>
   )
 }
 
