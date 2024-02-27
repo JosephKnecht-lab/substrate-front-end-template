@@ -1,10 +1,9 @@
 import { createTheme, PaletteMode } from '@mui/material'
-import { pink } from '@mui/material/colors'
 
 const baseTheme = {
   palette: {
     primary: {
-      main: '#7FFFD4',
+      main: '#E6007A',
     },
   },
 }
@@ -15,7 +14,9 @@ export const getDesignTokens = (mode: PaletteMode) => ({
     ...(mode === 'light'
       ? {
           // palette values for light mode
-          primary: pink,
+          primary: {
+            main: '#E6007A',
+          },
           divider: '#938e94',
           background: {
             default: '#f2f3f8',
@@ -28,7 +29,9 @@ export const getDesignTokens = (mode: PaletteMode) => ({
         }
       : {
           // palette values for dark mode
-          primary: pink,
+          primary: {
+            main: '#E6007A',
+          },
           divider: '#938e94',
           background: {
             default: '#383438',
