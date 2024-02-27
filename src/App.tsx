@@ -1,8 +1,14 @@
 import React, { createRef } from 'react'
-import { Dimmer, Loader, Grid, Message } from 'semantic-ui-react'
-import 'semantic-ui-css/semantic.min.css'
+import './global.css'
 
-import { Box, Container } from '@mui/material'
+import {
+  Alert,
+  AlertTitle,
+  Box,
+  CircularProgress,
+  Container,
+  Typography,
+} from '@mui/material'
 import { ThemeProvider, Grid as MUIGrid } from '@mui/material'
 import {
   useThemeContext,
@@ -33,23 +39,43 @@ function Main() {
   console.log('mode', mode)
 
   const loader = (text: string) => (
-    <Dimmer active>
-      <Loader size="small">{text}</Loader>
-    </Dimmer>
+    <Box
+      sx={{
+        display: 'flex',
+        justifyContent: 'center',
+        alignItems: 'center',
+        height: '100vh',
+        bgcolor: '#262626',
+        width: '100%',
+        flexDirection: 'column',
+        gap: '10px',
+      }}
+    >
+      <CircularProgress style={{ color: '#b8b3b9' }} size={25} />
+      <Typography variant="body2" sx={{ color: '#b8b3b9' }}>
+        {text}
+      </Typography>
+    </Box>
   )
 
   const message = (errObj: { target: { url: string } }) => (
-    <Grid centered columns={2} padded>
-      <Grid.Column>
-        <Message
-          negative
-          compact
-          floating
-          header="Error Connecting to Substrate"
-          content={`Connection to websocket '${errObj.target.url}' failed.`}
-        />
-      </Grid.Column>
-    </Grid>
+    <Box
+      sx={{
+        display: 'flex',
+        justifyContent: 'center',
+        alignItems: 'center',
+        height: '100vh',
+        bgcolor: mode === 'dark' ? '#2d292d' : '#f8f7f7',
+        width: '100%',
+        flexDirection: 'column',
+        gap: '10px',
+      }}
+    >
+      <Alert severity="error">
+        <AlertTitle>Error Connecting to Substrate</AlertTitle>
+        {`Connection to websocket '${errObj.target.url}' failed.`}
+      </Alert>
+    </Box>
   )
 
   if (apiState === 'ERROR') return message(apiError)
@@ -72,11 +98,12 @@ function Main() {
             minHeight: '100vh',
             my: 0,
             width: '100%',
+            py: 3,
           }}
         >
           <Container maxWidth="xl" sx={{ minHeight: '100vh', flexGrow: 1 }}>
             <AccountSelector />
-            <Grid stackable columns="equal">
+            <Box>
               <MUIGrid container spacing={2} sx={{ mt: '35px' }}>
                 <NodeInfo />
                 <Metadata />
@@ -95,10 +122,10 @@ function Main() {
                 </MUIGrid>
               </MUIGrid>
 
-              <Grid.Row>
+              <Box>
                 <TemplateModule />
-              </Grid.Row>
-            </Grid>
+              </Box>
+            </Box>
           </Container>
           <DeveloperConsole />
         </Box>

@@ -78,7 +78,7 @@ const Main: React.FC = () => {
               fontSize: '16px',
               letterSpacing: 0.2,
               fontWeight: '500',
-              my: 3,
+              my: 1.6,
             }}
           >
             {socket}

@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from 'react'
-import { Form } from 'semantic-ui-react'
 
 import { useSubstrateState } from './substrate-lib/index.tsx'
 import { TxButton, TxGroupButton } from './substrate-lib/components/index.tsx'
@@ -127,7 +126,7 @@ function Main() {
         ]
       }
     } else if (interxType === 'EXTRINSIC') {
-      const metaArgs = api.tx[palletRpc][callable].meta.args
+      const metaArgs = api?.tx?.[palletRpc]?.[callable]?.meta?.args
 
       if (metaArgs && metaArgs.length > 0) {
         paramFields = metaArgs.map(arg => ({
@@ -225,7 +224,7 @@ function Main() {
       >
         Pallet Interactor
       </Typography>
-      <Form>
+      <form>
         <FormControl component="fieldset" style={{ overflowX: 'auto' }}>
           <Typography
             sx={{ fontSize: '16px', my: 0.5 }}
@@ -428,7 +427,7 @@ function Main() {
           }}
         />
         <div style={{ overflowWrap: 'break-word' }}>{status}</div>
-      </Form>
+      </form>
     </Box>
   )
 }

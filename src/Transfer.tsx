@@ -1,5 +1,4 @@
 import React, { useState } from 'react'
-import { Form } from 'semantic-ui-react'
 import { TxButton } from './substrate-lib/components/index.tsx'
 import { useSubstrateState } from './substrate-lib/index.tsx'
 import {
@@ -52,6 +51,8 @@ export default function Main() {
 
   const { addressTo, amount } = formState
 
+  console.log(addressTo, 'formState')
+
   const { keyring } = useSubstrateState()
   const accounts = keyring?.getPairs()
 
@@ -76,17 +77,17 @@ export default function Main() {
       >
         Transfer
       </Typography>
-      <Form>
+      <form>
         <Box
           sx={{
             pl: 1,
-            py: 1.3,
+            py: 1,
             borderRadius: '5px',
             display: 'flex',
             alignItems: 'center',
-            border: '1px solid #d33079',
-            gap: '40px',
-            width: '55%',
+            border: '1px solid #E6007A',
+            gap: '30px',
+            width: '60%',
           }}
         >
           <ArrowRightAlt color="primary" fontSize="medium" />
@@ -94,6 +95,7 @@ export default function Main() {
             color={mode === 'light' ? '#555555' : '#938e94'}
             component={'span'}
             sx={{ mt: '2px' }}
+            fontSize={'14px'}
           >
             1 Unit = 100000000000000
           </Typography>
@@ -101,13 +103,13 @@ export default function Main() {
         <Box
           sx={{
             pl: 1,
-            py: 1.3,
+            py: 1,
             borderRadius: '5px',
             display: 'flex',
             alignItems: 'center',
-            border: '1px solid #d33079',
-            gap: '40px',
-            width: '75%',
+            border: '1px solid #E6007A',
+            gap: '30px',
+            width: '80%',
             mt: '10px',
           }}
         >
@@ -115,6 +117,7 @@ export default function Main() {
           <Typography
             color={mode === 'light' ? '#555555' : '#938e94'}
             component={'span'}
+            fontSize={'14px'}
             sx={{ mt: '2px' }}
           >
             Transfer more than the existential amount for account with 0 balance
@@ -261,7 +264,7 @@ export default function Main() {
           />
         </Box>
         <div style={{ overflowWrap: 'break-word' }}>{status}</div>
-      </Form>
+      </form>
     </Box>
   )
 }

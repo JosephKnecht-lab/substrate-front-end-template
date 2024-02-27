@@ -87,6 +87,7 @@ function Main() {
       <Box
         component={Paper}
         elevation={0}
+        className="custom-sc"
         sx={{
           mt: '20px',
           // bgcolor: '#fff',

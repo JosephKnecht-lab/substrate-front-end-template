@@ -1,8 +1,6 @@
 import React, { useState, useEffect } from 'react'
 import { CopyToClipboard } from 'react-copy-to-clipboard'
 
-import { Icon, Label } from 'semantic-ui-react'
-
 import Switch from '@mui/material/Switch'
 import { useThemeContext } from './theme/ThemeContextProvider.tsx'
 
@@ -17,6 +15,7 @@ import {
 } from '@mui/material'
 import {
   Apps,
+  Money,
   Notifications,
   SupervisedUserCircleOutlined,
 } from '@mui/icons-material'
@@ -73,7 +72,7 @@ function Main() {
     <Box
       sx={{
         width: '100%',
-        minHeight: '8vh',
+        minHeight: '6vh',
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'space-between',
@@ -254,10 +253,20 @@ function BalanceAnnotation() {
   }, [api, currentAccount])
 
   return currentAccount ? (
-    <Label pointing="left">
-      <Icon name="money" color="green" />
+    <Box
+      sx={{
+        px: 1.3,
+        py: 0.6,
+        borderRadius: '8px',
+        bgcolor: '#dad9d990',
+        display: 'flex',
+        alignItems: 'center',
+        gap: '8px',
+      }}
+    >
+      <Money color="success" />
       {accountBalance}
-    </Label>
+    </Box>
   ) : null
 }
 

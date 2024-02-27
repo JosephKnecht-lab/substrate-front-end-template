@@ -1,5 +1,3 @@
-// This component will simply add utility functions to your developer console.
-// This component will simply add utility functions to your developer console.
 import React from 'react'
 import { useSubstrateState } from '../index.tsx'
 import * as util from '@polkadot/util'

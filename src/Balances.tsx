@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from 'react'
-import { Label } from 'semantic-ui-react'
 import { CopyToClipboard } from 'react-copy-to-clipboard'
 import { useSubstrateState } from './substrate-lib/index.tsx'
 import {
@@ -12,6 +11,7 @@ import {
   IconButton,
   Box,
   Typography,
+  Alert,
 } from '@mui/material'
 import { makeStyles } from '@material-ui/core/styles'
 import { FileCopy } from '@mui/icons-material'
@@ -82,9 +82,9 @@ export default function Main() {
         Balances
       </Typography>
       {accounts.length === 0 ? (
-        <Label basic color="yellow">
+        <Alert sx={{ mt: '15px' }} severity="warning">
           No accounts to be shown
-        </Label>
+        </Alert>
       ) : (
         <TableContainer
           component={Paper}

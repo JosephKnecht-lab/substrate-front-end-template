@@ -1,8 +1,15 @@
 import React, { useEffect, useState } from 'react'
-import { Form, Input, Grid, Card, Statistic } from 'semantic-ui-react'
-
 import { useSubstrateState } from './substrate-lib/index.tsx'
 import { TxButton } from './substrate-lib/components/index.tsx'
+import {
+  Box,
+  Card,
+  CardContent,
+  Grid,
+  OutlinedInput,
+  Typography,
+} from '@mui/material'
+import { useThemeContext } from './theme/ThemeContextProvider.tsx'
 
 function Main() {
   const { api } = useSubstrateState()
@@ -35,24 +42,69 @@ function Main() {
     return () => unsubscribe && unsubscribe()
   }, [api?.query.templateModule])
 
+  const { mode } = useThemeContext()
+
   return (
-    <Grid.Column width={8}>
-      <h1>Template Module</h1>
-      <Card centered>
-        <Card.Content textAlign="center">
-          <Statistic label="Current Value" value={currentValue} />
-        </Card.Content>
+    <Grid xs={6} item>
+      <Typography
+        color={mode === 'light' ? '#3f3f3f' : '#b8b3b9'}
+        fontSize={'26px'}
+        fontWeight={'600'}
+        sx={{ mb: '10px' }}
+      >
+        Template Module
+      </Typography>
+      <Card
+        elevation={0}
+        sx={{
+          borderRadius: '5px',
+          boxShadow:
+            mode === 'light'
+              ? '0px 3px 1px -2px #ededed, 0px 2px 2px 0px #ededed, 0px 1px 5px 0px #ededed'
+              : 'none',
+          '& .MuiCardContent-root:last-child': {
+            paddingBottom: 1.3,
+          },
+        }}
+      >
+        <CardContent sx={{ pt: 1.6, px: 2.8 }}>
+          <Typography
+            fontWeight={'600'}
+            sx={{
+              fontSize: '24px',
+              letterSpacing: 0.2,
+              // color: '#283244',
+              lineHeight: '140%',
+            }}
+          >
+            Current Value
+          </Typography>
+          <Typography
+            sx={{
+              fontSize: '14px',
+              letterSpacing: 0.5,
+              color: '#949aa0',
+            }}
+          >
+            {currentValue}
+          </Typography>
+        </CardContent>
       </Card>
-      <Form>
-        <Form.Field>
-          <Input
-            label="New Value"
-            state="newValue"
-            type="number"
-            onChange={(_, { value }) => setFormValue(+value)}
-          />
-        </Form.Field>
-        <Form.Field style={{ textAlign: 'center' }}>
+
+      <form>
+        <OutlinedInput
+          label="New Value"
+          type="number"
+          onChange={e => setFormValue(+e.target.value)}
+        />
+
+        <Box
+          sx={{
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+          }}
+        >
           <TxButton
             label="Store Something"
             type="SIGNED-TX"
@@ -64,10 +116,10 @@ function Main() {
               paramFields: [true],
             }}
           />
-        </Form.Field>
+        </Box>
         <div style={{ overflowWrap: 'break-word' }}>{status}</div>
-      </Form>
-    </Grid.Column>
+      </form>
+    </Grid>
   )
 }
 

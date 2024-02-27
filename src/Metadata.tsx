@@ -10,24 +10,9 @@ import {
   Grid,
   Typography,
 } from '@mui/material'
-import { Modal } from 'semantic-ui-react'
 import { useThemeContext } from './theme/ThemeContextProvider.tsx'
 import { Metadata as MetaDataTypes } from '@polkadot/types'
-// import { makeStyles } from '@material-ui/core'
-
-// const useStyles = makeStyles(theme => ({
-//   modal: {
-//     display: 'flex',
-//     alignItems: 'center',
-//     justifyContent: 'center',
-//   },
-//   paper: {
-//     // backgroundColor: theme.palette.background.paper,
-//     border: '2px solid #000',
-//     boxShadow: theme.shadows[5],
-//     padding: theme.spacing(2, 4, 3),
-//   },
-// }))
+import { makeStyles, Modal, Backdrop, Fade } from '@material-ui/core'
 
 interface MetadataProps {
   data: MetaDataTypes | null
@@ -55,11 +40,30 @@ function Main() {
 
   const { mode } = useThemeContext()
 
-  // const classes = useStyles()
-  // const [open, setOpen] = useState(false)
-  // const handleClose = () => {
-  //   setOpen(false)
-  // }
+  const useStyles = makeStyles(theme => ({
+    modal: {
+      display: 'flex',
+      alignItems: 'center',
+      justifyContent: 'center',
+    },
+    paper: {
+      backgroundColor: mode === 'dark' ? '#383438' : '#f2f3f8',
+      border: '1px solid #383438',
+      borderRadius: '8px',
+      boxShadow: theme.shadows[5],
+      padding: theme.spacing(2, 4, 3),
+      maxWidth: '780px',
+      maxHeight: '550px',
+      overflowY: 'auto',
+    },
+  }))
+
+  const classes = useStyles()
+
+  const [open, setOpen] = useState(false)
+
+  const handleOpen = () => setOpen(true)
+  const handleClose = () => setOpen(false)
 
   return (
     <>
@@ -109,57 +113,30 @@ function Main() {
               pt: 0.7,
             }}
           >
-            <Modal
-              style={{ backgroundColor: 'red' }}
-              trigger={
-                <Button
-                  variant="contained"
-                  color="primary"
-                  // onClick={() => setOpen(true)}
-                  sx={{
-                    textTransform: 'capitalize',
-                    py: 0.6,
-                    fontSize: '12px',
-                  }}
-                >
-                  Show Metadata
-                </Button>
-              }
-            >
-              <Modal.Header
-                style={{
-                  backgroundColor: mode === 'dark' ? '#383438' : '#f2f3f8',
-                  color: mode === 'dark' ? '#b8b3b9' : '#3f3f3f',
+            <div>
+              <Button
+                variant="contained"
+                color="primary"
+                onClick={handleOpen}
+                sx={{
+                  textTransform: 'capitalize',
+                  py: 0.6,
+                  fontSize: '12px',
                 }}
               >
-                Runtime Metadata
-              </Modal.Header>{' '}
-              <Modal.Content
-                scrolling
-                style={{
-                  backgroundColor: mode === 'dark' ? '#383438' : '#f2f3f8',
-                  color: mode === 'dark' ? '#b8b3b9' : '#3f3f3f',
-                }}
-              >
-                {' '}
-                <Modal.Description>
-                  {' '}
-                  <pre>
-                    <code>{JSON.stringify(metadata.data, null, 2)}</code>{' '}
-                  </pre>{' '}
-                </Modal.Description>{' '}
-              </Modal.Content>{' '}
-            </Modal>
+                Show Metadata
+              </Button>
+            </div>
           </CardContent>
         </Card>
       </Grid>
 
-      {/* <Modal
-        aria-labelledby="transition-modal-title"
-        aria-describedby="transition-modal-description"
-        className={classes.modal}
+      <Modal
         open={open}
+        className={classes.modal}
         onClose={handleClose}
+        aria-labelledby="modal-modal-title"
+        aria-describedby="modal-modal-description"
         closeAfterTransition
         BackdropComponent={Backdrop}
         BackdropProps={{
@@ -167,39 +144,22 @@ function Main() {
         }}
       >
         <Fade in={open}>
-          <div className={classes.paper}>
-            <h2 id="transition-modal-title">Runtime Metadata</h2>
-            <pre>
-              <code>{JSON.stringify(metadata.data, null, 2)}</code>{' '}
+          <div className={`${classes.paper} custom-sc`}>
+            <h2
+              id="modal-modal-title"
+              style={{ color: mode === 'dark' ? '#b8b3b9' : '#3f3f3f' }}
+            >
+              Runtime Metadata
+            </h2>
+            <pre style={{ color: mode === 'dark' ? '#b8b3b9' : '#3f3f3f' }}>
+              <code>{JSON.stringify(metadata.data, null, 2)}</code>
             </pre>
           </div>
         </Fade>
-      </Modal> */}
+      </Modal>
     </>
   )
 }
-// <Grid.Column>
-//   <Card>
-//     <Card.Content>
-//       <Card.Header>Metadata</Card.Header>
-//       <Card.Meta>
-//         <span>v{metadata.version}</span>
-//       </Card.Meta>
-//     </Card.Content>
-//     <Card.Content extra>
-//       <Modal trigger={<Button>Show Metadata</Button>}>
-//         <Modal.Header>Runtime Metadata</Modal.Header>
-//         <Modal.Content scrolling>
-//           <Modal.Description>
-//             <pre>
-//               <code>{JSON.stringify(metadata.data, null, 2)}</code>
-//             </pre>
-//           </Modal.Description>
-//         </Modal.Content>
-//       </Modal>
-//     </Card.Content>
-//   </Card>
-// </Grid.Column>
 
 export default function Metadata(props: any) {
   const { api } = useSubstrateState()

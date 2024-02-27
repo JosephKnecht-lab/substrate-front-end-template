@@ -2,7 +2,6 @@ import React, { ChangeEvent, useState } from 'react'
 import { TxButton } from './substrate-lib/components/index.tsx'
 import { Box, InputAdornment, TextField, Typography } from '@mui/material'
 import { useThemeContext } from './theme/ThemeContextProvider.tsx'
-import { Form } from 'semantic-ui-react'
 
 export default function Main() {
   const [status, setStatus] = useState<string>('')
@@ -36,7 +35,7 @@ export default function Main() {
       >
         Upgrade Runtime
       </Typography>
-      <Form>
+      <form>
         <TextField
           type="file"
           onChange={(e: ChangeEvent<HTMLInputElement>) =>
@@ -113,7 +112,7 @@ export default function Main() {
           />
         </Box>
         <div style={{ overflowWrap: 'break-word' }}>{status}</div>
-      </Form>
+      </form>
     </Box>
   )
 }
