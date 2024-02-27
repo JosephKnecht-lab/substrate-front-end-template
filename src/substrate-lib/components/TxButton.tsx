@@ -132,8 +132,8 @@ const TxButton: React.FC<TxButtonProps> = ({
     const transformed = transformParams(paramFields, inputParams)
     // transformed can be empty parameters
     const txExecute = transformed
-      ? api?.tx.sudo.sudo(api.tx[palletRpc][callable](...transformed))
-      : api?.tx.sudo.sudo(api.tx[palletRpc][callable]())
+      ? api?.tx?.sudo?.sudo?.(api?.tx?.[palletRpc]?.[callable](...transformed))
+      : api?.tx?.sudo?.sudo?.(api?.tx?.[palletRpc]?.[callable]())
 
     const unsub = txExecute
       ?.signAndSend(...(fromAcct as [any, any]), txResHandler)
@@ -144,8 +144,8 @@ const TxButton: React.FC<TxButtonProps> = ({
 
   const uncheckedSudoTx = async () => {
     const fromAcct = await getFromAcct()
-    const txExecute = api?.tx.sudo.sudoUncheckedWeight(
-      api.tx[palletRpc][callable](...inputParams),
+    const txExecute = api?.tx?.sudo?.sudoUncheckedWeight(
+      api?.tx?.[palletRpc]?.[callable]?.(...inputParams),
       0
     )
 
@@ -162,8 +162,8 @@ const TxButton: React.FC<TxButtonProps> = ({
     // transformed can be empty parameters
 
     const txExecute = transformed
-      ? api?.tx[palletRpc][callable](...transformed)
-      : api?.tx[palletRpc][callable]()
+      ? api?.tx?.[palletRpc]?.[callable]?.(...transformed)
+      : api?.tx?.[palletRpc]?.[callable]?.()
 
     const unsub = await txExecute
       ?.signAndSend(...(fromAcct as [any, any]), txResHandler)
@@ -176,8 +176,8 @@ const TxButton: React.FC<TxButtonProps> = ({
     const transformed = transformParams(paramFields, inputParams)
     // transformed can be empty parameters
     const txExecute = transformed
-      ? api?.tx[palletRpc][callable](...transformed)
-      : api?.tx[palletRpc][callable]()
+      ? api?.tx?.[palletRpc]?.[callable]?.(...transformed)
+      : api?.tx?.[palletRpc]?.[callable]?.()
 
     const unsub = await txExecute?.send(txResHandler)?.catch(txErrHandler)
     setUnsub(() => unsub)
@@ -188,7 +188,7 @@ const TxButton: React.FC<TxButtonProps> = ({
 
   const query = async () => {
     const transformed = transformParams(paramFields, inputParams)
-    const unsub = await api?.query[palletRpc][callable](
+    const unsub = await api?.query?.[palletRpc]?.[callable]?.(
       ...transformed,
       queryResHandler
     )
@@ -201,7 +201,7 @@ const TxButton: React.FC<TxButtonProps> = ({
       emptyAsNull: false,
     })
     // @ts-ignore
-    const unsub = await api?.rpc[palletRpc][callable](
+    const unsub = await api?.rpc?.[palletRpc]?.[callable]?.(
       ...transformed,
       queryResHandler
     )
@@ -209,7 +209,7 @@ const TxButton: React.FC<TxButtonProps> = ({
   }
 
   const constant = () => {
-    const result: any = api?.consts[palletRpc][callable]
+    const result: any = api?.consts?.[palletRpc]?.[callable]
     result?.isNone ? setStatus('None') : setStatus(result?.toString())
   }
 
@@ -332,7 +332,7 @@ const TxButton: React.FC<TxButtonProps> = ({
       variant="contained"
       // style={style}
       sx={{ textTransform: 'capitalize' }}
-      type="submit"
+      type="button"
       onClick={transaction}
       disabled={
         disabled ||
