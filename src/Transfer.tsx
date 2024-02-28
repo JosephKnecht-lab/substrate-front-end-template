@@ -51,8 +51,6 @@ export default function Main() {
 
   const { addressTo, amount } = formState
 
-  console.log(addressTo, 'formState')
-
   const { keyring } = useSubstrateState()
   const accounts = keyring?.getPairs()
 

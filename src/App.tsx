@@ -36,8 +36,6 @@ function Main() {
   const { apiState, apiError, keyringState } = useSubstrateState()
   const { theme, mode } = useThemeContext()
 
-  console.log('mode', mode)
-
   const loader = (text: string) => (
     <Box
       sx={{
