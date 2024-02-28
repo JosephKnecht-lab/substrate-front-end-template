@@ -193,10 +193,6 @@ function Main() {
     setFormState(initFormState)
   }
 
-  // const getOptionalMsg = interxType =>
-  //   interxType === 'RPC'
-  //     ? 'Optional Parameter'
-  //     : 'Leaving this field as blank will submit a NONE value'
 
   const { mode } = useThemeContext()
 
