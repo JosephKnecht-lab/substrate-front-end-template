@@ -110,20 +110,6 @@ const Main: React.FC<MainProps> = props => {
       </Card>
     </Grid>
 
-    // <Grid.Column>
-    //   <Card>
-    //     <Card.Content textAlign="center">
-    //       <Statistic
-    //         className="block_number"
-    //         label={(finalized ? 'Finalized' : 'Current') + ' Block'}
-    //         value={blockNumber}
-    //       />
-    //     </Card.Content>
-    //     <Card.Content extra>
-    //       <Icon name="time" /> {blockNumberTimer}
-    //     </Card.Content>
-    //   </Card>
-    // </Grid.Column>
   )
 }
 

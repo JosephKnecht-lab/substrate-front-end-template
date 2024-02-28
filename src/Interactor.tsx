@@ -407,14 +407,7 @@ function Main() {
               ),
             }}
           />
-          //   {paramField.optional ? (
-          //     <Label
-          //       basic
-          //       pointing
-          //       color="teal"
-          //       content={getOptionalMsg(interxType)}
-          //     />
-          //   ) : null}
+
         ))}
         <InteractorSubmit
           setStatus={setStatus}
