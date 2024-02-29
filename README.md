@@ -128,7 +128,7 @@ it also displays the user's token balance. It is included in the template alread
 
 - You can set a custom theme based on your own branding colors via [`Theme`](https://github.com/stojanov-igor/substrate-front-end-template/blob/material-design-update/src/theme/theme.ts) option. See the example below on how you can set up this theme. Furthermore, you can configure your dark/light theme via the same file.
 
-  ```json
+  ```
   const baseTheme = {
     palette: {
       primary: {
@@ -137,6 +137,7 @@ it also displays the user's token balance. It is included in the template alread
     },
   }
   ```
+
 
 
 ## Miscellaneous
