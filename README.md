@@ -124,6 +124,21 @@ The [Account Selector](./src/AccountSelector.js) provides the user with a unifie
 select their account from a keyring. If the Balances module is installed in the runtime,
 it also displays the user's token balance. It is included in the template already.
 
+## Themes
+
+- You can set a custom theme based on your own branding colors via [`Theme`](https://github.com/stojanov-igor/substrate-front-end-template/blob/material-design-update/src/theme/theme.ts) option. See the example below on how you can set up this theme. Furthermore, you can configure your dark/light theme via the same file.
+
+  ```json
+  const baseTheme = {
+    palette: {
+      primary: {
+        main: '#E6007A',
+      },
+    },
+  }
+  ```
+
+
 ## Miscellaneous
 
 - Polkadot-js API and related crypto libraries depend on [`BigInt`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/BigInt) that is only supported by modern browsers. To ensure that react-scripts properly transpile your webapp code, update the `package.json` file:
