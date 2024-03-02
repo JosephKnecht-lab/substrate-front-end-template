@@ -138,7 +138,28 @@ it also displays the user's token balance. It is included in the template alread
   }
   ```
 
+## Running Tests in Cypress
 
+### Overview
+Cypress is an end-to-end testing framework for web applications. It provides a comprehensive toolset for writing, running, and debugging tests. This guide will walk you through the steps to run tests using Cypress.
+
+### Prerequisites
+Before running tests in Cypress, ensure you have the following prerequisites installed:
+- Node.js (version 10 or above)
+- npm (Node Package Manager) or yarn
+
+### Installation
+To install Cypress, run the following command in your terminal:
+```bash
+npm install cypress --save-dev
+```
+
+### Run Sample Tests
+Navigate to your project directory in the terminal.
+To open the Cypress Test Runner, run the following command:
+```bash
+npx cypress open
+```
 
 ## Miscellaneous
 
