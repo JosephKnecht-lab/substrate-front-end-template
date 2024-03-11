@@ -1,6 +1,4 @@
 import React, { useState, useEffect } from 'react'
-import { CopyToClipboard } from 'react-copy-to-clipboard'
-
 import Switch from '@mui/material/Switch'
 import { useThemeContext } from './theme/ThemeContextProvider.tsx'
 
@@ -8,15 +6,12 @@ import { useSubstrate, useSubstrateState } from './substrate-lib/index.tsx'
 import {
   Avatar,
   Box,
-  IconButton,
   MenuItem,
   Select,
   Typography,
 } from '@mui/material'
 import {
-  Apps,
   Money,
-  Notifications,
   SupervisedUserCircleOutlined,
 } from '@mui/icons-material'
 
@@ -119,14 +114,7 @@ function Main() {
 
         <Switch onClick={toggleColorMode} name="loading" color="primary" />
 
-        <IconButton sx={{ p: 0.2 }}>
-          <Notifications sx={{ color: '#899fb5' }} />
-        </IconButton>
-        <CopyToClipboard text={acctAddr(currentAccount)}>
-          <IconButton sx={{ p: 0.2 }}>
-            <Apps sx={{ color: '#899fb5' }} />
-          </IconButton>
-        </CopyToClipboard>
+        {/* <CopyToClipboard text={acctAddr(currentAccount)}></CopyToClipboard> */}
         <BalanceAnnotation />
 
         {currentAccount && (
