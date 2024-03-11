@@ -114,7 +114,6 @@ function Main() {
 
         <Switch onClick={toggleColorMode} name="loading" color="primary" />
 
-        {/* <CopyToClipboard text={acctAddr(currentAccount)}></CopyToClipboard> */}
         <BalanceAnnotation />
 
         {currentAccount && (
