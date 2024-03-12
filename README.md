@@ -161,6 +161,23 @@ To open the Cypress Test Runner, run the following command:
 npx cypress open
 ```
 
+## Docker
+
+### Building the docker image
+To create a Docker image locally, run the following command in your terminal:
+```bash
+docker build .
+```
+
+### Run a docker container
+Navigate to your local docker images in order to locate the newly created image.
+Then run the following command:
+```bash
+docker run <ContainerID>
+```
+This will start a docker container which will contain instructions on where you can access the application.
+
+
 ## Miscellaneous
 
 - Polkadot-js API and related crypto libraries depend on [`BigInt`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/BigInt) that is only supported by modern browsers. To ensure that react-scripts properly transpile your webapp code, update the `package.json` file:
