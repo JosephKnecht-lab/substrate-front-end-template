@@ -38,6 +38,7 @@ export default function Main() {
       <form>
         <TextField
           type="file"
+          data-cy="choose-file"
           onChange={(e: ChangeEvent<HTMLInputElement>) =>
             handleFileChosen(e.target.files![0])
           }

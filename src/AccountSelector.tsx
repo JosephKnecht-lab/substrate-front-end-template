@@ -60,7 +60,7 @@ function Main() {
     setCurrentAccount(keyring.getPair(addr))
   }
 
-  // const { theme, toggleColorMode } = useThemeContext()
+
   const { toggleColorMode, mode } = useThemeContext()
 
   return (
@@ -145,7 +145,7 @@ function Main() {
               ))}
             </Select>
             <Avatar
-              alt="Rayyaan"
+              alt="Josh"
               sx={{
                 backgroundColor: 'primary.main',
                 width: '40px',

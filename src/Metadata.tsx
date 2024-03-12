@@ -118,6 +118,7 @@ function Main() {
                 variant="contained"
                 color="primary"
                 onClick={handleOpen}
+                data-cy="show-metadata"
                 sx={{
                   textTransform: 'capitalize',
                   py: 0.6,
@@ -147,6 +148,7 @@ function Main() {
           <div className={`${classes.paper} custom-sc`}>
             <h2
               id="modal-modal-title"
+              data-cy="modal-title"
               style={{ color: mode === 'dark' ? '#b8b3b9' : '#3f3f3f' }}
             >
               Runtime Metadata
