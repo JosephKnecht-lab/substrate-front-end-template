@@ -50,7 +50,7 @@ function Main() {
         color={mode === 'light' ? '#3f3f3f' : '#b8b3b9'}
         fontSize={'26px'}
         fontWeight={'600'}
-        sx={{ mb: '10px' }}
+        sx={{ my: '10px' }}
       >
         Template Module
       </Typography>
