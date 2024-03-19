@@ -193,7 +193,6 @@ function Main() {
     setFormState(initFormState)
   }
 
-
   const { mode } = useThemeContext()
 
   const useStyles = makeStyles({
@@ -351,60 +350,62 @@ function Main() {
         </Select>
 
         {paramFields.map((paramField, ind) => (
-          <TextField
-            type="number"
-            value={inputParams[ind] ? inputParams[ind].value : ''}
-            onChange={e =>
-              onPalletCallableParamChange(e, {
-                state: { ind, paramField },
-                value: e.target.value,
-              })
-            }
-            variant="filled"
-            sx={{
-              width: '100%',
-              backgroundColor: 'primary.main',
-              mt: '10px',
-              mb: '15px',
-            }}
-            className={classes.input}
-            placeholder={paramField.type}
-            InputProps={{
-              disableUnderline: true,
-              inputProps: {
-                style: {
-                  background: mode === 'light' ? '#fff' : '#383438',
-                  color: mode === 'light' ? '#555555' : '#938e94',
-                  borderRadius: '0px',
+          <>
+            <TextField
+              type="number"
+              value={inputParams[ind] ? inputParams[ind].value : ''}
+              onChange={e =>
+                onPalletCallableParamChange(e, {
+                  state: { ind, paramField },
+                  value: e.target.value,
+                })
+              }
+              variant="filled"
+              sx={{
+                width: '100%',
+                backgroundColor: 'primary.main',
+                mt: '10px',
+                mb: '15px',
+              }}
+              className={classes.input}
+              placeholder={paramField.type}
+              InputProps={{
+                disableUnderline: true,
+                inputProps: {
+                  style: {
+                    background: mode === 'light' ? '#fff' : '#383438',
+                    color: mode === 'light' ? '#555555' : '#938e94',
+                    borderRadius: '0px',
+                  },
                 },
-              },
-              startAdornment: (
-                <InputAdornment
-                  position="start"
-                  sx={{
-                    px: '4px',
-                    py: '0px',
-                  }}
-                >
-                  <Typography
-                    variant="body2"
-                    component={'p'}
-                    color={'#fff'}
+                startAdornment: (
+                  <InputAdornment
+                    position="start"
                     sx={{
-                      fontWeight: '600',
-                      fontSize: '14px',
-                      mt: '-15px',
-                      mr: '5px',
+                      px: '4px',
+                      py: '0px',
                     }}
                   >
-                    {paramField.name}
-                  </Typography>
-                </InputAdornment>
-              ),
-            }}
-          />
-
+                    <Typography
+                      variant="body2"
+                      component={'p'}
+                      color={'#fff'}
+                      sx={{
+                        fontWeight: '600',
+                        fontSize: '14px',
+                        mt: '-15px',
+                        mr: '5px',
+                      }}
+                    >
+                      {paramField.name}
+                    </Typography>
+                  </InputAdornment>
+                ),
+              }}
+            />
+          </>
         ))}
+
         <InteractorSubmit
           setStatus={setStatus}
           attrs={{
