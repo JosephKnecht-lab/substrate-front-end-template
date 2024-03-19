@@ -71,7 +71,7 @@ function Main() {
           <Typography
             fontWeight={'600'}
             sx={{
-              fontSize: '24px',
+              fontSize: '12px',
               letterSpacing: 0.2,
               // color: '#283244',
               lineHeight: '140%',
@@ -96,13 +96,19 @@ function Main() {
           label="New Value"
           type="number"
           onChange={e => setFormValue(+e.target.value)}
+          sx={{
+            px: '4px',
+            py: '0px',
+            mt: 2,
+            mb: 2,
+          }}
         />
 
         <Box
           sx={{
             display: 'flex',
             alignItems: 'center',
-            justifyContent: 'center',
+            justifyContent: 'left',
           }}
         >
           <TxButton
