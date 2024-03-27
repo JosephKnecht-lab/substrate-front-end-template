@@ -416,7 +416,9 @@ function Main() {
             paramFields,
           }}
         />
-        <div style={{ overflowWrap: 'break-word' }}>{status}</div>
+        <div style={{ overflowWrap: 'break-word', marginTop: '1rem' }}>
+          {status}
+        </div>
       </form>
     </Box>
   )

@@ -19,3 +19,7 @@ body {
   background: #888;
   border-radius: 10px;
 }
+
+iframe {
+  display: none;
+}
