@@ -352,7 +352,7 @@ function Main() {
         {paramFields.map((paramField, ind) => (
           <>
             <TextField
-              type="number"
+              type="text"
               value={inputParams[ind] ? inputParams[ind].value : ''}
               onChange={e =>
                 onPalletCallableParamChange(e, {
