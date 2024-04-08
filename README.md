@@ -17,7 +17,7 @@ The codebase is installed using [git](https://git-scm.com/) and [yarn](https://y
 
 ```bash
 # Clone the repository
-git clone https://github.com/substrate-developer-hub/substrate-front-end-template.git
+git clone https://github.com/stojanov-igor/substrate-front-end-template.git
 cd substrate-front-end-template
 yarn install
 ```
@@ -37,16 +37,6 @@ yarn build
 ```
 
 and open `build/index.html` in your favorite browser.
-
-### Try the Hosted Version
-
-Connecting to your local Substrate node (Chrome and Firefox only):
-
-https://substrate-developer-hub.github.io/substrate-front-end-template?rpc=ws://localhost:9944
-
-Connecting to Polkadot:
-
-https://substrate-developer-hub.github.io/substrate-front-end-template?rpc=wss://rpc.polkadot.io
 
 
 ## Configuration
@@ -141,7 +131,7 @@ it also displays the user's token balance. It is included in the template alread
 ## Running Tests in Cypress
 
 ### Overview
-Cypress is an end-to-end testing framework for web applications. It provides a comprehensive toolset for writing, running, and debugging tests. This guide will walk you through the steps to run tests using Cypress.
+Cypress is an end-to-end testing framework for web applications. It provides a comprehensive tools for writing, running, and debugging tests. This guide will walk you through the steps to run tests using Cypress.
 
 ### Prerequisites
 Before running tests in Cypress, ensure you have the following prerequisites installed:
