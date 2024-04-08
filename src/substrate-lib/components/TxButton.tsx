@@ -1,26 +1,36 @@
 import React, { useState, useEffect } from 'react'
-import PropTypes from 'prop-types'
-import { Button } from 'semantic-ui-react'
 import { web3FromSource } from '@polkadot/extension-dapp'
 
-import { useSubstrateState } from '../'
-import utils from '../utils'
-import { bnFromHex } from '@polkadot/util';
+import { useSubstrateState } from '../index.tsx'
+import utils from '../utils.ts'
+import { bnFromHex } from '@polkadot/util'
+import { Box, Button } from '@mui/material'
 
-function TxButton({
+interface TxButtonProps {
+  attrs?: any
+  color?: string
+  disabled?: boolean
+  label: string
+  setStatus: (status: string) => void
+  style?: React.CSSProperties
+  type?: string
+  txOnClickHandler?: (param?: any) => void
+}
+
+const TxButton: React.FC<TxButtonProps> = ({
   attrs = null,
-  color = 'blue',
+  color = 'primary',
   disabled = false,
   label,
   setStatus,
   style = null,
   type = 'QUERY',
   txOnClickHandler = null,
-}) {
+}) => {
   // Hooks
   const { api, currentAccount } = useSubstrateState()
-  const [unsub, setUnsub] = useState(null)
-  const [sudoKey, setSudoKey] = useState(null)
+  const [unsub, setUnsub] = useState<(() => void) | null>(null)
+  const [sudoKey, setSudoKey] = useState<string | null>(null)
 
   const { palletRpc, callable, inputParams, paramFields } = attrs
 
@@ -60,73 +70,88 @@ function TxButton({
     return [address, { signer: injector.signer }]
   }
 
-  const txResHandler = ({ events = [], status, txHash }) =>{
+  const txResHandler = ({
+    events = [],
+    status,
+    txHash,
+  }: {
+    events: any[]
+    status: any
+    txHash: any
+  }) => {
     status.isFinalized
       ? setStatus(`😉 Finalized. Block hash: ${status.asFinalized.toString()}`)
       : setStatus(`Current transaction status: ${status.type}`)
 
-      // Loop through Vec<EventRecord> to display all events
-      events.forEach(({ _, event: { data, method, section } }) => {
-        if ((section + ":" + method) === 'system:ExtrinsicFailed' ) {
-          // extract the data for this event
-          const [dispatchError, dispatchInfo] = data;
-          console.log(`dispatchinfo: ${dispatchInfo}`)
-          let errorInfo;
-          
-          // decode the error
-          if (dispatchError.isModule) {
-            // for module errors, we have the section indexed, lookup
-            // (For specific known errors, we can also do a check against the
-            // api.errors.<module>.<ErrorName>.is(dispatchError.asModule) guard)
-            const mod = dispatchError.asModule
-            const error = api.registry.findMetaError(
-                new Uint8Array([mod.index.toNumber(), bnFromHex(mod.error.toHex().slice(0, 4)).toNumber()])
-            )
-            let message = `${error.section}.${error.name}${
-                Array.isArray(error.docs) ? `(${error.docs.join('')})` : error.docs || ''
-            }`
-            
-            errorInfo = `${message}`;
-            console.log(`Error-info::${JSON.stringify(error)}`)
-          } else {
-            // Other, CannotLookup, BadOrigin, no extra info
-            errorInfo = dispatchError.toString();
-          }
-          setStatus(`😞 Transaction Failed! ${section}.${method}::${errorInfo}`)
-        } else if (section + ":" + method === 'system:ExtrinsicSuccess' ) {
-          setStatus(`❤️️ Transaction successful! tx hash: ${txHash} , Block hash: ${status.asFinalized.toString()}`)
+    // Loop through Vec<EventRecord> to display all events
+    events.forEach(({ _, event: { data, method, section } }) => {
+      if (section + ':' + method === 'system:ExtrinsicFailed') {
+        // extract the data for this event
+        const [dispatchError, dispatchInfo] = data
+        console.log(`dispatchinfo: ${dispatchInfo}`)
+        let errorInfo
+
+        // decode the error
+        if (dispatchError.isModule) {
+          // for module errors, we have the section indexed, lookup
+          // (For specific known errors, we can also do a check against the
+          // api.errors.<module>.<ErrorName>.is(dispatchError.asModule) guard)
+          const mod = dispatchError.asModule
+          const error = api?.registry.findMetaError(
+            new Uint8Array([
+              mod.index.toNumber(),
+              bnFromHex(mod.error.toHex().slice(0, 4)).toNumber(),
+            ])
+          )
+          let message = `${error?.section}.${error?.name}${
+            Array.isArray(error?.docs)
+              ? `(${error.docs.join('')})`
+              : error?.docs || ''
+          }`
+
+          errorInfo = `${message}`
+          console.log(`Error-info::${JSON.stringify(error)}`)
+        } else {
+          // Other, CannotLookup, BadOrigin, no extra info
+          errorInfo = dispatchError.toString()
         }
-      });
+        setStatus(`😞 Transaction Failed! ${section}.${method}::${errorInfo}`)
+      } else if (section + ':' + method === 'system:ExtrinsicSuccess') {
+        setStatus(
+          `❤️️ Transaction successful! tx hash: ${txHash} , Block hash: ${status.asFinalized.toString()}`
+        )
+      }
+    })
   }
 
-  const txErrHandler = err =>
+  const txErrHandler = (err: any) =>
     setStatus(`😞 Transaction Failed: ${err.toString()}`)
 
   const sudoTx = async () => {
-    const fromAcct = await getFromAcct()
+    const fromAcct: any = await getFromAcct()
     const transformed = transformParams(paramFields, inputParams)
     // transformed can be empty parameters
     const txExecute = transformed
-      ? api.tx.sudo.sudo(api.tx[palletRpc][callable](...transformed))
-      : api.tx.sudo.sudo(api.tx[palletRpc][callable]())
+      ? api?.tx?.sudo?.sudo?.(api?.tx?.[palletRpc]?.[callable](...transformed))
+      : api?.tx?.sudo?.sudo?.(api?.tx?.[palletRpc]?.[callable]())
 
     const unsub = txExecute
-      .signAndSend(...fromAcct, txResHandler)
-      .catch(txErrHandler)
+      ?.signAndSend(...(fromAcct as [any, any]), txResHandler)
+      ?.catch(txErrHandler)
 
     setUnsub(() => unsub)
   }
 
   const uncheckedSudoTx = async () => {
     const fromAcct = await getFromAcct()
-    const txExecute = api.tx.sudo.sudoUncheckedWeight(
-      api.tx[palletRpc][callable](...inputParams),
+    const txExecute = api?.tx?.sudo?.sudoUncheckedWeight(
+      api?.tx?.[palletRpc]?.[callable]?.(...inputParams),
       0
     )
 
     const unsub = txExecute
-      .signAndSend(...fromAcct, txResHandler)
-      .catch(txErrHandler)
+      ?.signAndSend(...(fromAcct as [any, any]), txResHandler)
+      ?.catch(txErrHandler)
 
     setUnsub(() => unsub)
   }
@@ -137,12 +162,12 @@ function TxButton({
     // transformed can be empty parameters
 
     const txExecute = transformed
-      ? api.tx[palletRpc][callable](...transformed)
-      : api.tx[palletRpc][callable]()
+      ? api?.tx?.[palletRpc]?.[callable]?.(...transformed)
+      : api?.tx?.[palletRpc]?.[callable]?.()
 
     const unsub = await txExecute
-      .signAndSend(...fromAcct, txResHandler)
-      .catch(txErrHandler)
+      ?.signAndSend(...(fromAcct as [any, any]), txResHandler)
+      ?.catch(txErrHandler)
 
     setUnsub(() => unsub)
   }
@@ -151,19 +176,19 @@ function TxButton({
     const transformed = transformParams(paramFields, inputParams)
     // transformed can be empty parameters
     const txExecute = transformed
-      ? api.tx[palletRpc][callable](...transformed)
-      : api.tx[palletRpc][callable]()
+      ? api?.tx?.[palletRpc]?.[callable]?.(...transformed)
+      : api?.tx?.[palletRpc]?.[callable]?.()
 
-    const unsub = await txExecute.send(txResHandler).catch(txErrHandler)
+    const unsub = await txExecute?.send(txResHandler)?.catch(txErrHandler)
     setUnsub(() => unsub)
   }
 
-  const queryResHandler = result =>
+  const queryResHandler = (result: any) =>
     result.isNone ? setStatus('None') : setStatus(result.toString())
 
   const query = async () => {
     const transformed = transformParams(paramFields, inputParams)
-    const unsub = await api.query[palletRpc][callable](
+    const unsub = await api?.query?.[palletRpc]?.[callable]?.(
       ...transformed,
       queryResHandler
     )
@@ -175,7 +200,8 @@ function TxButton({
     const transformed = transformParams(paramFields, inputParams, {
       emptyAsNull: false,
     })
-    const unsub = await api.rpc[palletRpc][callable](
+    // @ts-ignore
+    const unsub = await api?.rpc?.[palletRpc]?.[callable]?.(
       ...transformed,
       queryResHandler
     )
@@ -183,8 +209,8 @@ function TxButton({
   }
 
   const constant = () => {
-    const result = api.consts[palletRpc][callable]
-    result.isNone ? setStatus('None') : setStatus(result.toString())
+    const result: any = api?.consts?.[palletRpc]?.[callable]
+    result?.isNone ? setStatus('None') : setStatus(result?.toString())
   }
 
   const transaction = async () => {
@@ -204,7 +230,9 @@ function TxButton({
       (isRpc() && rpc) ||
       (isConstant() && constant)
 
-    await asyncFunc()
+    if (typeof asyncFunc === 'function') {
+      await asyncFunc()
+    }
 
     return txOnClickHandler && typeof txOnClickHandler === 'function'
       ? txOnClickHandler(unsub)
@@ -212,13 +240,13 @@ function TxButton({
   }
 
   const transformParams = (
-    paramFields,
-    inputParams,
+    paramFields: any[],
+    inputParams: any[],
     opts = { emptyAsNull: true }
   ) => {
     // if `opts.emptyAsNull` is true, empty param value will be added to res as `null`.
     //   Otherwise, it will not be added
-    const paramVal = inputParams.map(inputParam => {
+    const paramVal = inputParams.map((inputParam: any) => {
       // To cater the js quirk that `null` is a type of `object`.
       if (
         typeof inputParam === 'object' &&
@@ -231,42 +259,45 @@ function TxButton({
       }
       return inputParam
     })
-    const params = paramFields.map((field, ind) => ({
+    const params = paramFields.map((field: any, ind: number) => ({
       ...field,
       value: paramVal[ind] || null,
     }))
 
-    return params.reduce((memo, { type = 'string', value }) => {
-      if (value == null || value === '')
-        return opts.emptyAsNull ? [...memo, null] : memo
+    return params.reduce(
+      (memo: any, { type = 'string', value }: { type: string; value: any }) => {
+        if (value == null || value === '')
+          return opts.emptyAsNull ? [...memo, null] : memo
 
-      let converted = value
+        let converted = value
 
-      // Deal with a vector
-      if (type.indexOf('Vec<') >= 0) {
-        converted = converted.split(',').map(e => e.trim())
-        converted = converted.map(single =>
-          isNumType(type)
-            ? single.indexOf('.') >= 0
-              ? Number.parseFloat(single)
-              : Number.parseInt(single)
-            : single
-        )
+        // Deal with a vector
+        if (type.indexOf('Vec<') >= 0) {
+          converted = converted.split(',').map((e: string) => e.trim())
+          converted = converted.map((single: string) =>
+            isNumType(type)
+              ? single.indexOf('.') >= 0
+                ? Number.parseFloat(single)
+                : Number.parseInt(single)
+              : single
+          )
+          return [...memo, converted]
+        }
+
+        // Deal with a single value
+        if (isNumType(type)) {
+          converted =
+            converted.indexOf('.') >= 0
+              ? Number.parseFloat(converted)
+              : Number.parseInt(converted)
+        }
         return [...memo, converted]
-      }
-
-      // Deal with a single value
-      if (isNumType(type)) {
-        converted =
-          converted.indexOf('.') >= 0
-            ? Number.parseFloat(converted)
-            : Number.parseInt(converted)
-      }
-      return [...memo, converted]
-    }, [])
+      },
+      []
+    )
   }
 
-  const isNumType = type =>
+  const isNumType = (type: string) =>
     utils.paramConversion.num.some(el => type.indexOf(el) >= 0)
 
   const allParamsFilled = () => {
@@ -274,7 +305,7 @@ function TxButton({
       return true
     }
 
-    return paramFields.every((paramField, ind) => {
+    return paramFields.every((paramField: any, ind: number) => {
       const param = inputParams[ind]
       if (paramField.optional) {
         return true
@@ -288,7 +319,7 @@ function TxButton({
     })
   }
 
-  const isSudoer = acctPair => {
+  const isSudoer = (acctPair: any) => {
     if (!sudoKey || !acctPair) {
       return false
     }
@@ -297,10 +328,11 @@ function TxButton({
 
   return (
     <Button
-      basic
-      color={color}
-      style={style}
-      type="submit"
+      color={'primary'}
+      variant="contained"
+      // style={style}
+      sx={{ textTransform: 'capitalize' }}
+      type="button"
       onClick={transaction}
       disabled={
         disabled ||
@@ -317,35 +349,15 @@ function TxButton({
   )
 }
 
-// prop type checking
-TxButton.propTypes = {
-  setStatus: PropTypes.func.isRequired,
-  type: PropTypes.oneOf([
-    'QUERY',
-    'RPC',
-    'SIGNED-TX',
-    'UNSIGNED-TX',
-    'SUDO-TX',
-    'UNCHECKED-SUDO-TX',
-    'CONSTANT',
-  ]).isRequired,
-  attrs: PropTypes.shape({
-    palletRpc: PropTypes.string,
-    callable: PropTypes.string,
-    inputParams: PropTypes.array,
-    paramFields: PropTypes.array,
-  }).isRequired,
-}
-
-function TxGroupButton(props) {
+function TxGroupButton(props: any) {
   return (
-    <Button.Group>
+    <Box sx={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
       <TxButton label="Unsigned" type="UNSIGNED-TX" color="grey" {...props} />
-      <Button.Or />
+      {/* <Button.Or /> */}
       <TxButton label="Signed" type="SIGNED-TX" color="blue" {...props} />
-      <Button.Or />
+      {/* <Button.Or /> */}
       <TxButton label="SUDO" type="SUDO-TX" color="red" {...props} />
-    </Button.Group>
+    </Box>
   )
 }
 

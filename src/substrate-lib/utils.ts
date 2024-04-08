@@ -1,4 +1,4 @@
-const utils = {
+const utils: { paramConversion: { num: string[] } } = {
   paramConversion: {
     num: [
       'Compact<Balance>',
